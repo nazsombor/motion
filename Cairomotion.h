@@ -13,6 +13,8 @@
 class Cairomotion : public Gtk::Window {
     Placeholder p1;
     Placeholder p2;
+    Placeholder p3;
+    PopupBar pb2;
     PopupBar pb1;
 
 public:

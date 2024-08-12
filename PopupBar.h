@@ -9,7 +9,14 @@
 
 class PopupBar : public Gtk::Box {
 public:
-    PopupBar(Gtk::Widget * spaceWidget, Gtk::Widget *popupWidget);
+    enum Align {LEFT, BOTTOM};
+private:
+    Align alignment;
+    Gtk::Widget *space;
+    Gtk::Widget *popup;
+
+public:
+    PopupBar(Gtk::Widget * space, Gtk::Widget *popup, Align align);
 };
 
 
