@@ -25,6 +25,8 @@ void Placeholder::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, in
         case YELLOW:
             cr->set_source_rgba(255/256.0, 191/256.0, 0/256.0, 1);
             break;
+        case WHITE:
+            cr->set_source_rgba(1, 1, 1, 1);
     }
     cr->rectangle(0, 0, width, height);
     cr->fill();

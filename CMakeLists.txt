@@ -16,6 +16,8 @@ add_executable(cairomotion main.cpp
         PopupBar.cpp
         PopupBar.h
         Placeholder.cpp
-        Placeholder.h)
+        Placeholder.h
+        ui/CanvasContainer.cpp
+        ui/CanvasContainer.h)
 
 target_link_libraries(cairomotion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params)

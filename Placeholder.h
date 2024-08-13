@@ -9,7 +9,7 @@
 
 class Placeholder : public Gtk::DrawingArea {
 public:
-    enum Color {RED, GREEN, YELLOW, BLUE};
+    enum Color {RED, GREEN, YELLOW, BLUE, WHITE};
 private:
     Color color;
 
