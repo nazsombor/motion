@@ -17,6 +17,9 @@ void Cairomotion::on_click(int type, double x, double y) {
         }
         case GDK_BUTTON_SECONDARY: {
             std::cout << "Secondary stylus button" << std::endl;
+            pb1.toogle_bar_visibility();
+            pb2.toogle_bar_visibility();
+            popup_visibility_changed = true;
             break;
         }
     }
@@ -69,5 +72,16 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         canvas.resize(c1.get_width(), c1.get_height());
         allow_canvas_resize_once_per_window_resize = false;
         }
+    if (popup_visibility_changed) {
+        popup_visibility_changed = false;
+        popup_visibility_change_timer = clock->get_frame_time();
+        allow_canvas_resize_just_after_toogling_popups = true;
+    }
+    if ((clock->get_frame_time() - popup_visibility_change_timer > 250000) &&
+        allow_canvas_resize_just_after_toogling_popups) {
+        canvas.resize(c1.get_width(), c1.get_height());
+        allow_canvas_resize_just_after_toogling_popups = false;
+
+    }
     return true;
 }

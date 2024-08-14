@@ -21,12 +21,18 @@ class Cairomotion : public Gtk::Window {
     PopupBar pb2;
     PopupBar pb1;
     Glib::RefPtr<Gtk::GestureClick> gc;
+    Glib::RefPtr<Gtk::GestureStylus> gs;
+
+    // canvas resize variables
     bool start_window_size_change = false;
     bool allow_canvas_resize_once_per_window_resize = false;
     int window_width, window_height;
     int canvas_width = 1920, canvas_height = 1080;
     gint64 window_size_change_timer = 0;
-    Glib::RefPtr<Gtk::GestureStylus> gs;
+    bool popup_visibility_changed;
+    gint64 popup_visibility_change_timer = 0;
+    bool allow_canvas_resize_just_after_toogling_popups;
+
 
     void on_click(int type, double x, double y);
 
