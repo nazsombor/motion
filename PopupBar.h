@@ -4,7 +4,9 @@
 
 #ifndef POPUPBAR_H
 #define POPUPBAR_H
-#include <gtkmm/box.h>
+#include <gtkmm.h>
+
+#include "ui/Canvas.h"
 
 
 class PopupBar : public Gtk::Box {
@@ -14,9 +16,15 @@ private:
     Align alignment;
     Gtk::Widget *space;
     Gtk::Widget *popup;
+    Canvas *canvas;
+    Glib::RefPtr<Gtk::EventControllerMotion> ecm;
 
 public:
-    PopupBar(Gtk::Widget * space, Gtk::Widget *popup, Align align);
+    PopupBar(Gtk::Widget *space, Gtk::Widget *popup, Canvas *canvas, Align align);
+
+    void mouse_enter(double x, double y);
+
+    void mouse_leave();
 };
 
 

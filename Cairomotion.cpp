@@ -9,16 +9,6 @@ void Cairomotion::on_click(int type, double x, double y) {
     switch(button) {
         case GDK_BUTTON_MIDDLE: {
             std::cout << "Middle stylus button" << std::endl;
-            canvas_is_maximized = !canvas_is_maximized;
-            if (canvas_is_maximized) {
-                auto width = get_width();
-                auto height = get_height();
-                p2.set_content_width(width - 30);
-                p2.set_content_height(height - 30);
-            } else {
-                p2.set_content_width(1920 / 10 *3);
-                p2.set_content_height(1080 / 10 * 3);
-            }
             break;
         }
         case GDK_BUTTON_PRIMARY: {
@@ -32,17 +22,17 @@ void Cairomotion::on_click(int type, double x, double y) {
     }
 }
 
-Cairomotion::Cairomotion(): p1(30, 30, Placeholder::RED), p2(30, 30, Placeholder::WHITE),
+Cairomotion::Cairomotion(): p1(30, 30, Placeholder::RED),
                             p3(30, 30, Placeholder::YELLOW),
-                            pb2(&c1, &p3, PopupBar::LEFT),
-                            pb1(&pb2, &p1, PopupBar::BOTTOM) {
-    p2.set_valign(Gtk::Align::CENTER);
-    p2.set_content_width(600);
-    p2.set_content_height(300);
-    c1.set_center_widget(p2);
+                            pb2(&c1, &p3, &canvas, PopupBar::LEFT),
+                            pb1(&pb2, &p1, &canvas, PopupBar::BOTTOM) {
+    canvas.set_valign(Gtk::Align::CENTER);
+    canvas.set_content_width(600);
+    canvas.set_content_height(300);
+    c1.set_center_widget(canvas);
 
     auto style = Gtk::CssProvider::create();
-    style->load_from_data(".center-container{ background-color: #ccc }");
+    style->load_from_data(".center-container{ background-color: #ccc; }");
     Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), style, 0);
     c1.add_css_class("center-container");
 
@@ -55,4 +45,29 @@ Cairomotion::Cairomotion(): p1(30, 30, Placeholder::RED), p2(30, 30, Placeholder
     add_controller(gc);
 
     add_tick_callback(sigc::mem_fun(*this, &Cairomotion::tick));
+}
+
+void Cairomotion::size_allocate_vfunc(int width, int height, int baseline) {
+    if (window_width != width || window_height != height) {
+        canvas.set_content_width(0);
+        canvas.set_content_height(0);
+        start_window_size_change = true;
+    }
+    window_width = width;
+    window_height = height;
+    Gtk::Widget::size_allocate_vfunc(width, height, baseline);
+}
+
+bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+    if (start_window_size_change) {
+        window_size_change_timer = clock->get_frame_time();
+        start_window_size_change = false;
+        allow_canvas_resize_once_per_window_resize = true;
+    }
+    if ((clock->get_frame_time() - window_size_change_timer) > 250000 &&
+        allow_canvas_resize_once_per_window_resize) {
+        canvas.resize(c1.get_width(), c1.get_height());
+        allow_canvas_resize_once_per_window_resize = false;
+        }
+    return true;
 }
