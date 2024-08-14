@@ -6,7 +6,7 @@
 #define POPUPBAR_H
 #include <gtkmm.h>
 
-#include "ui/Canvas.h"
+#include "Canvas.h"
 
 
 class PopupBar : public Gtk::Box {

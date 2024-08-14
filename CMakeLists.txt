@@ -13,10 +13,10 @@ link_directories(${GTKMM_LIBRARY_DIRS})
 add_executable(cairomotion main.cpp
         Cairomotion.cpp
         Cairomotion.h
-        PopupBar.cpp
-        PopupBar.h
-        Placeholder.cpp
-        Placeholder.h
+        ui/PopupBar.cpp
+        ui/PopupBar.h
+        ui/Placeholder.cpp
+        ui/Placeholder.h
         ui/CanvasContainer.cpp
         ui/CanvasContainer.h
         ui/Canvas.cpp
