@@ -47,6 +47,10 @@ Cairomotion::Cairomotion(): p1(30, 30, Placeholder::RED),
     gc->set_button(0);
     add_controller(gc);
 
+    eck = Gtk::EventControllerKey::create();
+    eck->signal_key_released().connect(sigc::mem_fun(*this, &Cairomotion::on_key_released));
+    add_controller(eck);
+
     add_tick_callback(sigc::mem_fun(*this, &Cairomotion::tick));
 }
 
@@ -59,6 +63,23 @@ void Cairomotion::size_allocate_vfunc(int width, int height, int baseline) {
     window_width = width;
     window_height = height;
     Gtk::Widget::size_allocate_vfunc(width, height, baseline);
+}
+
+void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) {
+    std::cout << key << std::endl;
+    switch(key) {
+        case 65480: { // F11
+            if (is_window_fullscreen) {
+                canvas.resize(0, 0);
+                unfullscreen();
+                is_window_fullscreen = false;
+            } else {
+                fullscreen();
+                is_window_fullscreen = true;
+            }
+            break;
+        }
+    }
 }
 
 bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
