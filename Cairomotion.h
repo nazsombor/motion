@@ -8,8 +8,9 @@
 #include <gtkmm.h>
 #include <iostream>
 
-#include "Placeholder.h"
-#include "PopupBar.h"
+#include "Drawings.h"
+#include "ui/Placeholder.h"
+#include "ui/PopupBar.h"
 #include "ui/Canvas.h"
 #include "ui/CanvasContainer.h"
 
@@ -23,6 +24,8 @@ class Cairomotion : public Gtk::Window {
     Glib::RefPtr<Gtk::GestureClick> gc;
     Glib::RefPtr<Gtk::GestureStylus> gs;
     Glib::RefPtr<Gtk::EventControllerKey> eck;
+
+    Drawings drawings;
 
     // canvas resize variables
     bool start_window_size_change = false;

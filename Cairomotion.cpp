@@ -4,6 +4,9 @@
 
 #include "Cairomotion.h"
 
+#include "ui/Placeholder.h"
+#include "ui/PopupBar.h"
+
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
     switch(button) {
@@ -32,6 +35,7 @@ Cairomotion::Cairomotion(): p1(30, 30, Placeholder::RED),
     canvas.set_valign(Gtk::Align::CENTER);
     canvas.set_content_width(600);
     canvas.set_content_height(300);
+    canvas.drawings = &drawings;
     c1.set_center_widget(canvas);
 
     auto style = Gtk::CssProvider::create();
@@ -42,14 +46,18 @@ Cairomotion::Cairomotion(): p1(30, 30, Placeholder::RED),
     set_default_size(1300, 900);
     set_child(pb1);
 
+    gs = Gtk::GestureStylus::create();
+    canvas.setup_gesture_stylus(gs);
+
     gc = Gtk::GestureClick::create();
-    gc->signal_released().connect(sigc::mem_fun(*this, &Cairomotion::on_click));
     gc->set_button(0);
-    add_controller(gc);
+    gc->signal_released().connect(sigc::mem_fun(*this, &Cairomotion::on_click));
+    canvas.add_controller(gc); //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
 
     eck = Gtk::EventControllerKey::create();
     eck->signal_key_released().connect(sigc::mem_fun(*this, &Cairomotion::on_key_released));
     add_controller(eck);
+
 
     add_tick_callback(sigc::mem_fun(*this, &Cairomotion::tick));
 }
