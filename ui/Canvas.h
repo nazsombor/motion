@@ -18,7 +18,7 @@ class Canvas : public Gtk::DrawingArea{
     ink::stroke_model::StrokeModelParams params;
     ink::stroke_model::StrokeModeler modeler;
     std::chrono::milliseconds time;
-    std::vector<ink::stroke_model::Result> smoothedStroke;
+    std::vector<ink::stroke_model::Result> smoothed_stroke;
     bool is_stylus_down = false;
 
 public:

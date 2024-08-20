@@ -28,9 +28,9 @@ void Cairomotion::on_click(int type, double x, double y) {
     }
 }
 
-Cairomotion::Cairomotion(): p1(30, 30, Placeholder::RED),
-                            p3(30, 30, Placeholder::YELLOW),
-                            pb2(&c1, &p3, &canvas, PopupBar::LEFT),
+Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
+                            p2(3000, 3000, Placeholder::YELLOW),
+                            pb2(&c1, &p2, &canvas, PopupBar::LEFT),
                             pb1(&pb2, &p1, &canvas, PopupBar::BOTTOM) {
     canvas.set_valign(Gtk::Align::CENTER);
     canvas.set_content_width(600);

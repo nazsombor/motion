@@ -13,14 +13,14 @@
 #include "ui/PopupBar.h"
 #include "ui/Canvas.h"
 #include "ui/CanvasContainer.h"
+#include "ui/ScrolledWidget.h"
 
 class Cairomotion : public Gtk::Window {
-    Placeholder p1;
-    Placeholder p3;
+    Placeholder p1, p2;
+    ScrolledWidget sw1, sw2;
     CanvasContainer c1;
     Canvas canvas;
-    PopupBar pb2;
-    PopupBar pb1;
+    PopupBar pb2, pb1;
     Glib::RefPtr<Gtk::GestureClick> gc;
     Glib::RefPtr<Gtk::GestureStylus> gs;
     Glib::RefPtr<Gtk::EventControllerKey> eck;

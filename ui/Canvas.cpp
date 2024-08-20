@@ -52,7 +52,7 @@ void Canvas::on_stylus_down(double x, double y) {
     std::cout << x << " " << y << std::endl;
     modeler.Reset();
 
-    smoothedStroke.clear();
+    smoothed_stroke.clear();
 
     time = duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
@@ -66,8 +66,8 @@ void Canvas::on_stylus_down(double x, double y) {
     input.orientation = M_PI;
     input.tilt = 0;
 
-    modeler.Update(input, smoothedStroke);
-    drawings->pen(smoothedStroke);
+    modeler.Update(input, smoothed_stroke);
+    drawings->pen(smoothed_stroke);
     queue_draw();
 }
 
@@ -87,8 +87,8 @@ void Canvas::on_stylus_motion(gdouble x, gdouble y) {
     input.orientation = M_PI;
     input.tilt = 0;
 
-    modeler.Update(input, smoothedStroke);
-    drawings->pen(smoothedStroke);
+    modeler.Update(input, smoothed_stroke);
+    drawings->pen(smoothed_stroke);
     queue_draw();
 }
 
@@ -108,8 +108,8 @@ void Canvas::on_stylus_up(double x, double y) {
     input.orientation = M_PI;
     input.tilt = 0;
 
-    modeler.Update(input, smoothedStroke);
-    drawings->pen(smoothedStroke);
+    modeler.Update(input, smoothed_stroke);
+    drawings->pen(smoothed_stroke);
     queue_draw();
 }
 

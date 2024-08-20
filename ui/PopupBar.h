@@ -7,6 +7,8 @@
 #include <gtkmm.h>
 
 #include "Canvas.h"
+#include "Placeholder.h"
+#include "ScrolledWidget.h"
 
 
 class PopupBar : public Gtk::Box {
@@ -14,6 +16,9 @@ public:
     enum Align {LEFT, BOTTOM};
 private:
     Align alignment;
+    Gtk::Box b;
+    Placeholder p;
+    ScrolledWidget sw;
     Gtk::Widget *space;
     Gtk::Widget *popup;
     Canvas *canvas;
