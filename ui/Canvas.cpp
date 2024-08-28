@@ -67,7 +67,7 @@ void Canvas::on_stylus_down(double x, double y) {
     input.tilt = 0;
 
     modeler.Update(input, smoothed_stroke);
-    drawings->pen(smoothed_stroke);
+    drawings->pencil(smoothed_stroke);
     queue_draw();
 }
 
@@ -88,7 +88,7 @@ void Canvas::on_stylus_motion(gdouble x, gdouble y) {
     input.tilt = 0;
 
     modeler.Update(input, smoothed_stroke);
-    drawings->pen(smoothed_stroke);
+    drawings->pencil(smoothed_stroke);
     queue_draw();
 }
 
@@ -109,7 +109,7 @@ void Canvas::on_stylus_up(double x, double y) {
     input.tilt = 0;
 
     modeler.Update(input, smoothed_stroke);
-    drawings->pen(smoothed_stroke);
+    drawings->pencil(smoothed_stroke);
     queue_draw();
 }
 

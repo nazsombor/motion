@@ -32,3 +32,36 @@ void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
         }
     }
 }
+
+void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
+    std::cout << "Stroke" << std::endl;
+    // Glib::RefPtr<Cairo::Context> cr = Cairo::Context::create(surface);
+
+    surface->flush();
+    int width = surface->get_width();
+    int height = surface->get_height();
+    unsigned char *data = surface->get_data();
+    int stride = surface->get_stride();
+
+
+    for (int i = 1; i < stroke.size(); i++) {
+        auto a = stroke[i - 1];
+        auto b = stroke[i];
+
+        double dX = (b.position.x - a.position.x) / 5;
+        double dY = (b.position.y - a.position.y) / 5;
+        double dP = (b.pressure - a.pressure) / 5;
+
+        for (int j = 0; j < 5; j++) {
+
+            data[(int)(a.position.y + j * dY) * stride + (int) (a.position.x + j * dX) * 4] = 0x00;
+            data[(int)(a.position.y + j * dY) * stride + (int) (a.position.x + j * dX) * 4 + 1] = 0x00;
+            data[(int)(a.position.y + j * dY) * stride + (int) (a.position.x + j * dX) * 4 + 2] = 0x00;
+            data[(int)(a.position.y + j * dY) * stride + (int) (a.position.x + j * dX) * 4 + 3] = 0xff;
+        }
+
+
+    }
+    surface->mark_dirty(0, 0, width,height);
+    surface->flush();
+}
