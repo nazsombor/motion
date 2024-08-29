@@ -67,6 +67,7 @@ void Canvas::on_stylus_down(double x, double y) {
     input.tilt = 0;
 
     modeler.Update(input, smoothed_stroke);
+    drawings->clear_pencil_data();
     drawings->pencil(smoothed_stroke);
     queue_draw();
 }

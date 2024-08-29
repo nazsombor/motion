@@ -11,6 +11,15 @@
 
 class Drawings {
     Cairo::RefPtr<Cairo::ImageSurface> surface;
+    int stroke_index;
+
+    struct Pencil {
+        int index;
+        int value;
+    };
+    std::vector<Pencil*> p;
+
+    int index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, int stride, int j, int x, int y);
 public:
 
     Drawings();
@@ -20,6 +29,8 @@ public:
     void pen(std::vector<ink::stroke_model::Result> &stroke);
 
     void pencil(std::vector<ink::stroke_model::Result> &stroke);
+
+    void clear_pencil_data();
 };
 
 
