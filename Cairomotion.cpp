@@ -30,7 +30,8 @@ void Cairomotion::on_click(int type, double x, double y) {
 
 Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
                             p2(3000, 3000, Placeholder::YELLOW),
-                            pb2(&c1, &p2, &canvas, PopupBar::LEFT),
+                            drawings(tools),
+                            pb2(&c1, &tools, &canvas, PopupBar::LEFT),
                             pb1(&pb2, &p1, &canvas, PopupBar::BOTTOM) {
     canvas.set_valign(Gtk::Align::CENTER);
     canvas.set_content_width(600);
@@ -39,10 +40,16 @@ Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
     c1.set_center_widget(canvas);
 
     auto style = Gtk::CssProvider::create();
-    style->load_from_data(".center-container{ background-color: #ccc; }");
+    style->load_from_data(R"(
+        .center-container{ background-color: #ccc; }
+.selected-tool { background: #00f; color: white;})");
     Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), style, 0);
     c1.add_css_class("center-container");
-
+    tools.pen.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.pencil.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.eraser.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.solid_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.textured_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     set_default_size(1300, 900);
     set_child(pb1);
 

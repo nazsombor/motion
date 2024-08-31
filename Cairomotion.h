@@ -14,9 +14,11 @@
 #include "ui/Canvas.h"
 #include "ui/CanvasContainer.h"
 #include "ui/ScrolledWidget.h"
+#include "ui/Tools.h"
 
 class Cairomotion : public Gtk::Window {
     Placeholder p1, p2;
+    Tools tools;
     ScrolledWidget sw1, sw2;
     CanvasContainer c1;
     Canvas canvas;

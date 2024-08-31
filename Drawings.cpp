@@ -60,7 +60,8 @@ int Drawings::index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, 
 
 }
 
-Drawings::Drawings() {
+Drawings::Drawings(Tools &tools) {
+    this->tools = &tools;
     surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
 }
 

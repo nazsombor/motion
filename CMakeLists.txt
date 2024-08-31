@@ -24,6 +24,8 @@ add_executable(cairomotion main.cpp
         Drawings.cpp
         Drawings.h
         ui/ScrolledWidget.cpp
-        ui/ScrolledWidget.h)
+        ui/ScrolledWidget.h
+        ui/Tools.cpp
+        ui/Tools.h)
 
 target_link_libraries(cairomotion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params)

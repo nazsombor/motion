@@ -67,8 +67,16 @@ void Canvas::on_stylus_down(double x, double y) {
     input.tilt = 0;
 
     modeler.Update(input, smoothed_stroke);
-    drawings->clear_pencil_data();
-    drawings->pencil(smoothed_stroke);
+    switch (drawings->tools->type) {
+        case Tools::PEN:
+            drawings->pen(smoothed_stroke);
+            break;
+        case Tools::PENCIL:
+            drawings->clear_pencil_data();
+            drawings->pencil(smoothed_stroke);
+            break;
+    }
+
     queue_draw();
 }
 
@@ -89,7 +97,14 @@ void Canvas::on_stylus_motion(gdouble x, gdouble y) {
     input.tilt = 0;
 
     modeler.Update(input, smoothed_stroke);
-    drawings->pencil(smoothed_stroke);
+    switch (drawings->tools->type) {
+        case Tools::PEN:
+            drawings->pen(smoothed_stroke);
+        break;
+        case Tools::PENCIL:
+            drawings->pencil(smoothed_stroke);
+        break;
+    }
     queue_draw();
 }
 
@@ -110,7 +125,14 @@ void Canvas::on_stylus_up(double x, double y) {
     input.tilt = 0;
 
     modeler.Update(input, smoothed_stroke);
-    drawings->pencil(smoothed_stroke);
+    switch (drawings->tools->type) {
+        case Tools::PEN:
+            drawings->pen(smoothed_stroke);
+        break;
+        case Tools::PENCIL:
+            drawings->pencil(smoothed_stroke);
+        break;
+    }
     queue_draw();
 }
 
