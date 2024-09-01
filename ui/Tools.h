@@ -6,6 +6,8 @@
 #define TOOLS_H
 #include <gtkmm.h>
 
+#include "ColorPicker.h"
+
 
 class Tools : public Gtk::Box{
 public:
@@ -17,6 +19,7 @@ public:
     Gtk::Button eraser;
     Gtk::Button solid_brush;
     Gtk::Button textured_brush;
+    ColorPicker color_picker;
 
     Tools();
 

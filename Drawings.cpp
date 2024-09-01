@@ -63,6 +63,8 @@ int Drawings::index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, 
 Drawings::Drawings(Tools &tools) {
     this->tools = &tools;
     surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+
 }
 
 void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int height) {
@@ -70,6 +72,9 @@ void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int
     auto h = (double) height / 1080;
     cr->scale(w, h);
     cr->set_source(surface, 0, 0);
+    cr->paint();
+    cr->scale(w, h);
+    cr->set_source(surface2, 0, 0);
     cr->paint();
 }
 
@@ -125,7 +130,7 @@ void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
                 data[i3 + 3] = (int) data[i2 + 3] + 0x11 > 0xff ? 0xff : data[i2 + 3] + 0x11;
             }
 
-            if (jp > .6) {
+            if (jp > .7) {
                 int i2 = index(a, b, stride, j, 0, -1);
                 data[i2] = 0x00;
                 data[i2 + 1] = 0x00;

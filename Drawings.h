@@ -11,7 +11,7 @@
 
 
 class Drawings {
-    Cairo::RefPtr<Cairo::ImageSurface> surface;
+    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2;
     int stroke_index;
 
     int index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, int stride, int j, int x, int y);

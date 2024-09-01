@@ -8,6 +8,7 @@
 
 Tools::Tools() {
     append(tools_box);
+    append(color_picker);
     set_orientation(Gtk::Orientation::VERTICAL);
     tools_box.set_orientation(Gtk::Orientation::HORIZONTAL);
     tools_box.append(pen);
