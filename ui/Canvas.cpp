@@ -75,6 +75,9 @@ void Canvas::on_stylus_down(double x, double y) {
             drawings->clear_pencil_data();
             drawings->pencil(smoothed_stroke);
             break;
+        case Tools::SOLID_BRUSH:
+            drawings->clear_pencil_data();
+            drawings->solid_brush(smoothed_stroke);
     }
 
     queue_draw();
@@ -104,6 +107,8 @@ void Canvas::on_stylus_motion(gdouble x, gdouble y) {
         case Tools::PENCIL:
             drawings->pencil(smoothed_stroke);
         break;
+        case Tools::SOLID_BRUSH:
+            drawings->solid_brush(smoothed_stroke);
     }
     queue_draw();
 }
@@ -132,6 +137,8 @@ void Canvas::on_stylus_up(double x, double y) {
         case Tools::PENCIL:
             drawings->pencil(smoothed_stroke);
         break;
+        case Tools::SOLID_BRUSH:
+            drawings->solid_brush(smoothed_stroke);
     }
     queue_draw();
 }

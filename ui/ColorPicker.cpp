@@ -26,15 +26,21 @@ ColorPicker::ColorPicker() : adjustment(Gtk::Adjustment::create(0, 0, 255)){
 }
 
 void ColorPicker::on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int height) {
+    std::cout << "It draws" << std::endl;
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            cr->set_source_rgb((double) x / width, (double) y / height, (double) adjustment->get_value() / 256.0);
-
+            double lr = (double) x / width, lg = (double) y / height, lb = (double) adjustment->get_value() / 256.0;
+            cr->set_source_rgb(lr, lg, lb);
             cr->rectangle(x, y, 1, 1);
             cr->fill();
-
         }
     }
+    double lr = (double) x / width, lg = (double) y / height, lb = (double) adjustment->get_value() / 256.0;
+    cr->set_source_rgb(lr, lg, lb);
+    cr->rectangle(x - 10, y - 10, 20, 20);
+    cr->fill_preserve();
+    cr->set_source_rgb(0, 0, 0);
+    cr->stroke();
 }
 
 void ColorPicker::on_adjustment_changed() {
@@ -44,4 +50,6 @@ void ColorPicker::on_adjustment_changed() {
 void ColorPicker::on_click(int count, double x, double y) {
     std::cout << "Clicked at (" << x << ", " << y << ")" << std::endl;
     r = x / get_width(), g = y / get_height(), b = adjustment->get_value() / 256.0;
+    this->x = x; this->y = y;
+    drawing_area.queue_draw();
 }

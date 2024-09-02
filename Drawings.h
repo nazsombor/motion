@@ -27,6 +27,8 @@ public:
 
     void pencil(std::vector<ink::stroke_model::Result> &stroke);
 
+    void solid_brush(std::vector<ink::stroke_model::Result> &stroke);
+
     void clear_pencil_data();
 };
 

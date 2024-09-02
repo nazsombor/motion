@@ -71,10 +71,10 @@ void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int
     auto w = (double) width / 1920;
     auto h = (double) height / 1080;
     cr->scale(w, h);
-    cr->set_source(surface, 0, 0);
-    cr->paint();
-    cr->scale(w, h);
     cr->set_source(surface2, 0, 0);
+    cr->paint();
+    //cr->scale(w, h);
+    cr->set_source(surface, 0, 0);
     cr->paint();
 }
 
@@ -157,6 +157,23 @@ void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
 
     stroke_index = stroke.size() - 1;
     surface->mark_dirty(0, 0, width,height);
+}
+
+void Drawings::solid_brush(std::vector<ink::stroke_model::Result> &stroke) {
+
+    double size = 100.0;
+
+    auto cr = Cairo::Context::create(surface2);
+
+    for (int i = stroke_index; i < stroke.size(); i++) {
+        auto a = stroke[i];
+
+        cr->set_source_rgb(tools->color_picker.r, tools->color_picker.g, tools->color_picker.b);
+        cr->arc( a.position.x, a.position.y, a.pressure * a.pressure * size, 0, 2 * M_PI);
+        cr->fill();
+    }
+
+    stroke_index = stroke.size() - 1;
 }
 
 void Drawings::clear_pencil_data() {

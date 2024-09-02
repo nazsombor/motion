@@ -13,9 +13,11 @@ class ColorPicker : public Gtk::Box{
     const Glib::RefPtr<Gtk::Adjustment> adjustment;
     int value = 0;
     Glib::RefPtr<Gtk::GestureClick> click;
-    double r, g, b;
+    int x = 0, y = 0;
 
 public:
+    double r = 0.0, g = 0.0, b = 0.0;
+
     ColorPicker();
 
     void on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int height);
