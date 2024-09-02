@@ -94,6 +94,20 @@ void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) 
             }
             break;
         }
+        case 65363: { //Right arrow
+            drawings.step_forward();
+            canvas.queue_draw();
+            break;
+        }
+        case 65361: { //Left arrow
+            drawings.step_backward();
+            canvas.queue_draw();
+            break;
+        }
+        case 32: {
+            drawings.play = !drawings.play;
+            break;
+        }
     }
 }
 
@@ -119,5 +133,14 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         allow_canvas_resize_just_after_toogling_popups = false;
 
     }
+
+    if (drawings.play) {
+        if (clock->get_frame_time() - drawings.previous_frame_time > drawings.frame_duration) {
+            drawings.previous_frame_time = clock->get_frame_time();
+            drawings.play_next();
+            canvas.queue_draw();
+        }
+    }
+
     return true;
 }
