@@ -20,6 +20,7 @@ public:
     Gtk::Button solid_brush;
     Gtk::Button textured_brush;
     ColorPicker color_picker;
+    bool solid_brush_selected;
 
     Tools();
 

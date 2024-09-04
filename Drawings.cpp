@@ -5,8 +5,8 @@
 #include "Drawings.h"
 
 Frame::Frame() {
-    surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920,1080);
-    surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920,1080);
+    surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
 }
 
 int Drawings::index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, int stride, int j, int x, int y) {
@@ -61,8 +61,7 @@ int Drawings::index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, 
         y = 0;
     }
 
-    return (int)(a.position.y + y + j * dY) * stride + (int) (a.position.x + x + j * dX) * 4;
-
+    return (int) (a.position.y + y + j * dY) * stride + (int) (a.position.x + x + j * dX) * 4;
 }
 
 Drawings::Drawings(Tools &tools) {
@@ -91,14 +90,13 @@ void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
         double dP = (b.pressure - a.pressure) / 5;
 
         for (int j = 0; j < 5; j++) {
-            cr->arc( a.position.x + j * dX, a.position.y + j * dY, (a.pressure + j * dP) * 5, 0, 2 * M_PI);
+            cr->arc(a.position.x + j * dX, a.position.y + j * dY, (a.pressure + j * dP) * 5, 0, 2 * M_PI);
             cr->fill();
         }
     }
 }
 
 void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
-
     frames[frameIndex].surface->flush();
     int width = frames[frameIndex].surface->get_width();
     int height = frames[frameIndex].surface->get_height();
@@ -158,11 +156,10 @@ void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
     }
 
     stroke_index = stroke.size() - 1;
-    frames[frameIndex].surface->mark_dirty(0, 0, width,height);
+    frames[frameIndex].surface->mark_dirty(0, 0, width, height);
 }
 
 void Drawings::solid_brush(std::vector<ink::stroke_model::Result> &stroke) {
-
     double size = 100.0;
 
     auto cr = Cairo::Context::create(frames[frameIndex].surface2);
@@ -171,7 +168,7 @@ void Drawings::solid_brush(std::vector<ink::stroke_model::Result> &stroke) {
         auto a = stroke[i];
 
         cr->set_source_rgb(tools->color_picker.r, tools->color_picker.g, tools->color_picker.b);
-        cr->arc( a.position.x, a.position.y, a.pressure * a.pressure * size, 0, 2 * M_PI);
+        cr->arc(a.position.x, a.position.y, a.pressure * a.pressure * size, 0, 2 * M_PI);
         cr->fill();
     }
 
@@ -203,4 +200,53 @@ void Drawings::play_next() {
     } else {
         frameIndex++;
     }
+}
+
+void Drawings::fill_area(int x, int y) {
+    unsigned char check_color[4], fill_color[4] = {
+        (unsigned char) (tools->color_picker.b * 256), (unsigned char) (tools->color_picker.g * 256),
+        (unsigned char) (tools->color_picker.r * 256), 255
+    };
+    std::memcpy(check_color, pixel(x, y), sizeof(check_color));
+
+    std::cout << "check_color: " << (int) check_color[0] << " " << (int) check_color[1] << " " << (int) check_color[2]
+            << " " << (int) check_color[3] << " " << std::endl;
+    std::cout << "fill_color: " << (int) fill_color[0] << " " << (int) fill_color[1] << " " << (int) fill_color[2] <<
+            " " << (int) fill_color[3] << " " << std::endl;
+
+    std::vector<std::pair<int, int> > points;
+    points.emplace_back(x, y);
+
+
+    while (!points.empty()) {
+        for (int i = 0; i < points.size(); i++) {
+            auto p = pixel(points[i].first, points[i].second);
+            if ((p[0] == check_color[0] && p[1] == check_color[1] && p[2] == check_color[2]) ||
+                p[3] < 255) {
+                p[0] = fill_color[0];
+                p[1] = fill_color[1];
+                p[2] = fill_color[2];
+                p[3] = fill_color[3];
+
+                auto a = pixel(points[i].first + 1, points[i].second);
+                auto b = pixel(points[i].first, points[i].second + 1);
+                auto c = pixel(points[i].first, points[i].second - 1);
+                auto d = pixel(points[i].first - 1, points[i].second);
+
+                    points.emplace_back(points[i].first + 1, points[i].second);
+                    points.emplace_back(points[i].first, points[i].second + 1);
+                    points.emplace_back(points[i].first, points[i].second - 1);
+                    points.emplace_back(points[i].first - 1, points[i].second);
+
+            } else {
+                points.erase(points.begin() + i);
+            }
+        }
+    }
+}
+
+unsigned char *Drawings::pixel(int x, int y) {
+    int stride = frames[frameIndex].surface2->get_stride();
+    int index = (stride * y) + (4 * x);
+    return frames[frameIndex].surface2->get_data() + index;
 }

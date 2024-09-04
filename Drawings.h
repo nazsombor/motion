@@ -13,8 +13,6 @@ class Frame {
     public:
     Cairo::RefPtr<Cairo::ImageSurface> surface, surface2;
     Frame();
-
-
 };
 
 
@@ -48,5 +46,9 @@ public:
     void step_backward();
 
     void play_next();
+
+    void fill_area(int x, int y);
+
+    unsigned char * pixel(int x, int y);
 };
 #endif //DRAWINGS_H

@@ -56,6 +56,7 @@ void Tools::select_pen() {
     eraser.remove_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
+    solid_brush_selected = false;
 }
 
 void Tools::select_pencil() {
@@ -65,6 +66,7 @@ void Tools::select_pencil() {
     eraser.remove_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
+    solid_brush_selected = false;
 }
 
 void Tools::select_eraser() {
@@ -74,6 +76,7 @@ void Tools::select_eraser() {
     eraser.add_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
+    solid_brush_selected = false;
 }
 
 void Tools::select_solid_brush() {
@@ -83,6 +86,7 @@ void Tools::select_solid_brush() {
     eraser.remove_css_class("selected-tool");
     solid_brush.add_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
+    solid_brush_selected = true;
 }
 
 void Tools::select_textured_brush() {
@@ -92,4 +96,5 @@ void Tools::select_textured_brush() {
     eraser.remove_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.add_css_class("selected-tool");
+    solid_brush_selected = false;
 }

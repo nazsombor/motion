@@ -9,9 +9,16 @@
 
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
+    auto r = 1980.0 / canvas.get_width();
+
     switch(button) {
         case GDK_BUTTON_MIDDLE: {
             std::cout << "Middle stylus button" << std::endl;
+            if (tools.solid_brush_selected) {
+                int x_int = r * x;
+                int y_int = r * y;
+                drawings.fill_area(x_int, y_int);
+            }
             break;
         }
         case GDK_BUTTON_PRIMARY: {
