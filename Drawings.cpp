@@ -202,7 +202,19 @@ void Drawings::play_next() {
     }
 }
 
+class FillArea {
+public:
+    int x, y;
+    int please_continue;
+
+    FillArea(int x, int y, int p_continue) : x(x), y(y), please_continue(p_continue) {
+    }
+};
+
 void Drawings::fill_area(int x, int y) {
+    frames[frameIndex].surface2->flush();
+
+
     unsigned char check_color[4], fill_color[4] = {
         (unsigned char) (tools->color_picker.b * 256), (unsigned char) (tools->color_picker.g * 256),
         (unsigned char) (tools->color_picker.r * 256), 255
@@ -214,35 +226,88 @@ void Drawings::fill_area(int x, int y) {
     std::cout << "fill_color: " << (int) fill_color[0] << " " << (int) fill_color[1] << " " << (int) fill_color[2] <<
             " " << (int) fill_color[3] << " " << std::endl;
 
-    std::vector<std::pair<int, int> > points;
-    points.emplace_back(x, y);
+    std::vector<FillArea> points;
+    points.emplace_back(x, y, 0);
 
 
     while (!points.empty()) {
-        for (int i = 0; i < points.size(); i++) {
-            auto p = pixel(points[i].first, points[i].second);
-            if ((p[0] == check_color[0] && p[1] == check_color[1] && p[2] == check_color[2]) ||
-                p[3] < 255) {
-                p[0] = fill_color[0];
-                p[1] = fill_color[1];
-                p[2] = fill_color[2];
-                p[3] = fill_color[3];
+        for (int i = points.size() - 1; i >= 0; i--) {
 
-                auto a = pixel(points[i].first + 1, points[i].second);
-                auto b = pixel(points[i].first, points[i].second + 1);
-                auto c = pixel(points[i].first, points[i].second - 1);
-                auto d = pixel(points[i].first - 1, points[i].second);
+            auto p = pixel(points[i].x, points[i].y);
 
-                    points.emplace_back(points[i].first + 1, points[i].second);
-                    points.emplace_back(points[i].first, points[i].second + 1);
-                    points.emplace_back(points[i].first, points[i].second - 1);
-                    points.emplace_back(points[i].first - 1, points[i].second);
-
-            } else {
+            if (p[0] == fill_color[0] && p[1] == fill_color[1] && p[2] == fill_color[2] && p[3] == fill_color[3]) {
                 points.erase(points.begin() + i);
+                continue;
             }
+
+            p[0] = fill_color[0];
+            p[1] = fill_color[1];
+            p[2] = fill_color[2];
+            p[3] = fill_color[3];
+
+            if (points[i].please_continue > 1) {
+                points.erase(points.begin() + i);
+                continue;
+            }
+
+            auto a = pixel(points[i].x + 1, points[i].y);
+            auto b = pixel(points[i].x, points[i].y + 1);
+            auto c = pixel(points[i].x, points[i].y - 1);
+            auto d = pixel(points[i].x - 1, points[i].y);
+
+            if (a[0] == check_color[0] && a[1] == check_color[1] && a[2] == check_color[2] && a[3] == check_color[3]) {
+                points.emplace_back(points[i].x + 1, points[i].y, 0);
+            } else {
+                auto j = 1;
+                if (points[i].please_continue <= 1) {
+                    if (points[i].please_continue == 1) {
+                        j = 2;
+                    }
+                    points.emplace_back(points[i].x + 1, points[i].y, j);
+                }
+            }
+
+            if (b[0] == check_color[0] && b[1] == check_color[1] && b[2] == check_color[2] && b[3] == check_color[3]) {
+                points.emplace_back(points[i].x, points[i].y + 1, 0);
+            } else {
+                auto j = 1;
+                if (points[i].please_continue <= 1) {
+                    if (points[i].please_continue == 1) {
+                        j = 2;
+                    }
+                    points.emplace_back(points[i].x, points[i].y + 1, j);
+                }
+            }
+
+            if (c[0] == check_color[0] && c[1] == check_color[1] && c[2] == check_color[2] && c[3] == check_color[3]) {
+                points.emplace_back(points[i].x, points[i].y - 1, 0);
+            } else {
+                auto j = 1;
+                if (points[i].please_continue <= 1) {
+                    if (points[i].please_continue == 1) {
+                        j = 2;
+                    }
+                    points.emplace_back(points[i].x, points[i].y - 1, j);
+                }
+            }
+
+            if (d[0] == check_color[0] && d[1] == check_color[1] && d[2] == check_color[2] && d[3] == check_color[3]) {
+                points.emplace_back(points[i].x - 1, points[i].y, 0);
+            } else {
+                auto j = 1;
+                if (points[i].please_continue <= 1) {
+                    if (points[i].please_continue == 1) {
+                        j = 2;
+                    }
+                    points.emplace_back(points[i].x - 1, points[i].y, j);
+                }
+            }
+
+            points.erase(points.begin() + i);
         }
     }
+
+    frames[frameIndex].surface2->mark_dirty();
 }
 
 unsigned char *Drawings::pixel(int x, int y) {
