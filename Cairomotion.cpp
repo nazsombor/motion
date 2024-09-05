@@ -9,7 +9,7 @@
 
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
-    auto r = 1980.0 / canvas.get_width();
+    auto r = 1920.0 / canvas.get_width() ;
 
     switch(button) {
         case GDK_BUTTON_MIDDLE: {
@@ -17,6 +17,7 @@ void Cairomotion::on_click(int type, double x, double y) {
             if (tools.solid_brush_selected) {
                 int x_int = r * x;
                 int y_int = r * y;
+                std::cout << x_int << " " << y_int << std::endl;
                 drawings.fill_area(x_int, y_int);
             }
             break;

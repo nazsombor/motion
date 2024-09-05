@@ -160,7 +160,7 @@ void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
 }
 
 void Drawings::solid_brush(std::vector<ink::stroke_model::Result> &stroke) {
-    double size = 100.0;
+    double size = 50.0;
 
     auto cr = Cairo::Context::create(frames[frameIndex].surface2);
 
@@ -267,7 +267,12 @@ void Drawings::fill_area(int x, int y) {
                 }
             }
 
-            if (b[0] == check_color[0] && b[1] == check_color[1] && b[2] == check_color[2] && b[3] == check_color[3]) {
+            bool b0 = b[0] == check_color[0];
+            bool b1 = b[1] == check_color[1];
+            bool b2 = b[2] == check_color[2];
+            bool b3 = b[3] == check_color[3];
+
+            if (b0 && b1 && b2 && b3) {
                 points.emplace_back(points[i].x, points[i].y + 1, 0);
             } else {
                 auto j = 1;
