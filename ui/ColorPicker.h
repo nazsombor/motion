@@ -6,6 +6,9 @@
 #define COLORPICKER_H
 #include <gtkmm.h>
 
+#include "ColorList.h"
+#include "CurrentColor.h"
+
 
 class ColorPicker : public Gtk::Box{
     Gtk::DrawingArea drawing_area;
@@ -14,11 +17,12 @@ class ColorPicker : public Gtk::Box{
     int value = 0;
     Glib::RefPtr<Gtk::GestureClick> click;
     int x = 0, y = 0;
+    CurrentColor * current_color;
 
 public:
     double r = 0.0, g = 0.0, b = 0.0;
 
-    ColorPicker();
+    ColorPicker(CurrentColor *current_color);
 
     void on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int height);
 

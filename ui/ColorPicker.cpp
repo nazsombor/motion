@@ -8,7 +8,7 @@
 #include <vector>
 
 
-ColorPicker::ColorPicker() : adjustment(Gtk::Adjustment::create(0, 0, 255)){
+ColorPicker::ColorPicker(CurrentColor *current_color) : adjustment(Gtk::Adjustment::create(0, 0, 255)){
     set_orientation(Gtk::Orientation::VERTICAL);
     set_halign(Gtk::Align::START);
     append(drawing_area);
@@ -23,6 +23,8 @@ ColorPicker::ColorPicker() : adjustment(Gtk::Adjustment::create(0, 0, 255)){
     click = Gtk::GestureClick::create();
     click->signal_pressed().connect(sigc::mem_fun(*this, &ColorPicker::on_click));
     drawing_area.add_controller(click);
+    this->current_color = current_color;
+
 }
 
 void ColorPicker::on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int height) {
@@ -51,5 +53,6 @@ void ColorPicker::on_click(int count, double x, double y) {
     std::cout << "Clicked at (" << x << ", " << y << ")" << std::endl;
     r = x / get_width(), g = y / get_height(), b = adjustment->get_value() / 256.0;
     this->x = x; this->y = y;
+    current_color->update_color(x, y, adjustment->get_value());
     drawing_area.queue_draw();
 }

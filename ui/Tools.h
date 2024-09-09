@@ -6,7 +6,9 @@
 #define TOOLS_H
 #include <gtkmm.h>
 
+#include "ColorList.h"
 #include "ColorPicker.h"
+#include "CurrentColor.h"
 
 
 class Tools : public Gtk::Box{
@@ -19,6 +21,8 @@ public:
     Gtk::Button eraser;
     Gtk::Button solid_brush;
     Gtk::Button textured_brush;
+    ColorList   color_list;
+    CurrentColor current_color;
     ColorPicker color_picker;
     bool solid_brush_selected;
 

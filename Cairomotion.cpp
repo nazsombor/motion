@@ -19,6 +19,7 @@ void Cairomotion::on_click(int type, double x, double y) {
                 int y_int = r * y;
                 std::cout << x_int << " " << y_int << std::endl;
                 drawings.fill_area(x_int, y_int);
+                canvas.queue_draw();
             }
             break;
         }

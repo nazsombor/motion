@@ -28,6 +28,11 @@ add_executable(cairomotion main.cpp
         ui/Tools.cpp
         ui/Tools.h
         ui/ColorPicker.cpp
-        ui/ColorPicker.h)
+        ui/ColorPicker.h
+        ui/ColorList.cpp
+        ui/ColorList.h
+        ui/CurrentColor.cpp
+        ui/CurrentColor.h
+)
 
 target_link_libraries(cairomotion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params)

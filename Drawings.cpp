@@ -214,7 +214,6 @@ public:
 void Drawings::fill_area(int x, int y) {
     frames[frameIndex].surface2->flush();
 
-
     unsigned char check_color[4], fill_color[4] = {
         (unsigned char) (tools->color_picker.b * 256), (unsigned char) (tools->color_picker.g * 256),
         (unsigned char) (tools->color_picker.r * 256), 255
@@ -232,7 +231,6 @@ void Drawings::fill_area(int x, int y) {
 
     while (!points.empty()) {
         for (int i = points.size() - 1; i >= 0; i--) {
-
             auto p = pixel(points[i].x, points[i].y);
 
             if (p[0] == fill_color[0] && p[1] == fill_color[1] && p[2] == fill_color[2] && p[3] == fill_color[3]) {
@@ -250,61 +248,75 @@ void Drawings::fill_area(int x, int y) {
                 continue;
             }
 
+            bool up = points[i].y - 1 >= 0, down = points[i].y + 1 < 1080, left = points[i].x - 1 > 0, right =
+                    points[i].x <= 1920;
+
+
             auto a = pixel(points[i].x + 1, points[i].y);
             auto b = pixel(points[i].x, points[i].y + 1);
             auto c = pixel(points[i].x, points[i].y - 1);
             auto d = pixel(points[i].x - 1, points[i].y);
 
-            if (a[0] == check_color[0] && a[1] == check_color[1] && a[2] == check_color[2] && a[3] == check_color[3]) {
-                points.emplace_back(points[i].x + 1, points[i].y, 0);
-            } else {
-                auto j = 1;
-                if (points[i].please_continue <= 1) {
-                    if (points[i].please_continue == 1) {
-                        j = 2;
+            if (right) {
+                if (a[0] == check_color[0] && a[1] == check_color[1] && a[2] == check_color[2] && a[3] == check_color[
+                        3]) {
+                    points.emplace_back(points[i].x + 1, points[i].y, 0);
+                } else {
+                    auto j = 1;
+                    if (points[i].please_continue <= 1) {
+                        if (points[i].please_continue == 1) {
+                            j = 2;
+                        }
+                        points.emplace_back(points[i].x + 1, points[i].y, j);
                     }
-                    points.emplace_back(points[i].x + 1, points[i].y, j);
                 }
             }
 
-            bool b0 = b[0] == check_color[0];
-            bool b1 = b[1] == check_color[1];
-            bool b2 = b[2] == check_color[2];
-            bool b3 = b[3] == check_color[3];
+            if (down) {
+                if (b[0] == check_color[0] && b[1] == check_color[1] && b[2] == check_color[2] && b[3] == check_color[
+                        3]) {
+                    if (points[i].y + 1 < 1080)
+                        points.emplace_back(points[i].x, points[i].y + 1, 0);
+                } else {
+                    auto j = 1;
+                    if (points[i].please_continue <= 1) {
+                        if (points[i].please_continue == 1) {
+                            j = 2;
+                        }
 
-            if (b0 && b1 && b2 && b3) {
-                points.emplace_back(points[i].x, points[i].y + 1, 0);
-            } else {
-                auto j = 1;
-                if (points[i].please_continue <= 1) {
-                    if (points[i].please_continue == 1) {
-                        j = 2;
+                        points.emplace_back(points[i].x, points[i].y + 1, j);
                     }
-                    points.emplace_back(points[i].x, points[i].y + 1, j);
                 }
             }
 
-            if (c[0] == check_color[0] && c[1] == check_color[1] && c[2] == check_color[2] && c[3] == check_color[3]) {
-                points.emplace_back(points[i].x, points[i].y - 1, 0);
-            } else {
-                auto j = 1;
-                if (points[i].please_continue <= 1) {
-                    if (points[i].please_continue == 1) {
-                        j = 2;
+            if (up) {
+                if (c[0] == check_color[0] && c[1] == check_color[1] && c[2] == check_color[2] && c[3] == check_color[
+                        3]) {
+                    if (points[i].y - 1 >= 0)
+                        points.emplace_back(points[i].x, points[i].y - 1, 0);
+                } else {
+                    auto j = 1;
+                    if (points[i].please_continue <= 1) {
+                        if (points[i].please_continue == 1) {
+                            j = 2;
+                        }
+                        points.emplace_back(points[i].x, points[i].y - 1, j);
                     }
-                    points.emplace_back(points[i].x, points[i].y - 1, j);
                 }
             }
 
-            if (d[0] == check_color[0] && d[1] == check_color[1] && d[2] == check_color[2] && d[3] == check_color[3]) {
-                points.emplace_back(points[i].x - 1, points[i].y, 0);
-            } else {
-                auto j = 1;
-                if (points[i].please_continue <= 1) {
-                    if (points[i].please_continue == 1) {
-                        j = 2;
+            if (left) {
+                if (d[0] == check_color[0] && d[1] == check_color[1] && d[2] == check_color[2] && d[3] == check_color[
+                        3]) {
+                    points.emplace_back(points[i].x - 1, points[i].y, 0);
+                } else {
+                    auto j = 1;
+                    if (points[i].please_continue <= 1) {
+                        if (points[i].please_continue == 1) {
+                            j = 2;
+                        }
+                        points.emplace_back(points[i].x - 1, points[i].y, j);
                     }
-                    points.emplace_back(points[i].x - 1, points[i].y, j);
                 }
             }
 

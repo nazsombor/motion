@@ -6,9 +6,11 @@
 
 #include <iostream>
 
-Tools::Tools() {
+Tools::Tools() : current_color(&color_list), color_picker(&current_color){
     append(tools_box);
     append(color_picker);
+    append(current_color);
+    append(color_list);
     set_orientation(Gtk::Orientation::VERTICAL);
     tools_box.set_orientation(Gtk::Orientation::HORIZONTAL);
     tools_box.append(pen);
@@ -28,6 +30,8 @@ Tools::Tools() {
     eraser.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_eraser));
     solid_brush.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_solid_brush));
     textured_brush.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_textured_brush));
+
+
 
     switch(type) {
         case PEN:
