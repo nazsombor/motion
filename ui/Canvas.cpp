@@ -114,6 +114,11 @@ void Canvas::on_stylus_motion(gdouble x, gdouble y) {
 }
 
 void Canvas::on_stylus_up(double x, double y) {
+
+    if (stylus_up_is_not_primary_button) {
+        return;
+    }
+
     auto duration = duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
     );
@@ -131,14 +136,18 @@ void Canvas::on_stylus_up(double x, double y) {
 
     modeler.Update(input, smoothed_stroke);
     switch (drawings->tools->type) {
-        case Tools::PEN:
+        case Tools::PEN: {
             drawings->pen(smoothed_stroke);
-        break;
-        case Tools::PENCIL:
+            break;
+        }
+        case Tools::PENCIL: {
             drawings->pencil(smoothed_stroke);
-        break;
-        case Tools::SOLID_BRUSH:
+            break;
+        }
+        case Tools::SOLID_BRUSH: {
             drawings->solid_brush(smoothed_stroke);
+            break;
+        }
     }
     queue_draw();
 }

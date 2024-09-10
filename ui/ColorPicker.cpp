@@ -47,6 +47,7 @@ void ColorPicker::on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int
 
 void ColorPicker::on_adjustment_changed() {
     drawing_area.queue_draw();
+    current_color->update_color(x, y, adjustment->get_value());
 }
 
 void ColorPicker::on_click(int count, double x, double y) {

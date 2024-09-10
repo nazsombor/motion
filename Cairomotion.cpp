@@ -21,10 +21,12 @@ void Cairomotion::on_click(int type, double x, double y) {
                 drawings.fill_area(x_int, y_int);
                 canvas.queue_draw();
             }
+            canvas.stylus_up_is_not_primary_button = true;
             break;
         }
         case GDK_BUTTON_PRIMARY: {
             std::cout << "Primary stylus button" << std::endl;
+            canvas.stylus_up_is_not_primary_button = false;
             break;
         }
         case GDK_BUTTON_SECONDARY: {
@@ -32,6 +34,7 @@ void Cairomotion::on_click(int type, double x, double y) {
             pb1.toogle_bar_visibility();
             pb2.toogle_bar_visibility();
             popup_visibility_changed = true;
+            canvas.stylus_up_is_not_primary_button = true;
             break;
         }
     }

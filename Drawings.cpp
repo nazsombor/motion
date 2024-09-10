@@ -94,6 +94,7 @@ void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
             cr->fill();
         }
     }
+    std::cout << "pen " << stroke.size() << std::endl;
 }
 
 void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
@@ -103,6 +104,7 @@ void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
     unsigned char *data = frames[frameIndex].surface->get_data();
     int stride = frames[frameIndex].surface->get_stride();
 
+    std::cout << "pencil " << stroke.size() <<  std::endl;
 
     for (int i = stroke_index + 1; i < stroke.size(); i++) {
         auto a = stroke[i - 1];
@@ -173,6 +175,8 @@ void Drawings::solid_brush(std::vector<ink::stroke_model::Result> &stroke) {
     }
 
     stroke_index = stroke.size() - 1;
+
+    std::cout << "solid brush" << stroke.size() << std::endl;
 }
 
 void Drawings::clear_pencil_data() {
