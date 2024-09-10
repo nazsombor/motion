@@ -11,16 +11,16 @@
 
 
 class ColorPicker : public Gtk::Box{
-    Gtk::DrawingArea drawing_area;
     Gtk::Scrollbar scrollbar;
-    const Glib::RefPtr<Gtk::Adjustment> adjustment;
     int value = 0;
     Glib::RefPtr<Gtk::GestureClick> click;
-    int x = 0, y = 0;
     CurrentColor * current_color;
 
 public:
+    Gtk::DrawingArea drawing_area;
     double r = 0.0, g = 0.0, b = 0.0;
+    int x = 0, y = 0;
+    const Glib::RefPtr<Gtk::Adjustment> adjustment;
 
     ColorPicker(CurrentColor *current_color);
 

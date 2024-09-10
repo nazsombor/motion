@@ -19,10 +19,6 @@ CurrentColor::CurrentColor(ColorList *list) {
 
      add_button.signal_clicked().connect(sigc::mem_fun(*this, &CurrentColor::on_add_button_clicked));
      append(add_button);
-
-
-
-
 }
 
 void CurrentColor::update_color(int r, int g, int b) {

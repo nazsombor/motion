@@ -59,6 +59,7 @@ Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
     tools.eraser.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.solid_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.textured_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.color_list.get_style_context()->add_provider(style,GTK_STYLE_PROVIDER_PRIORITY_USER);
     set_default_size(1300, 900);
     set_child(pb1);
 
@@ -149,6 +150,17 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
             drawings.play_next();
             canvas.queue_draw();
         }
+    }
+
+    if (tools.color_list.update_color_picker) {
+        tools.color_list.update_color_picker = false;
+        tools.color_picker.r = tools.color_list.r;
+        tools.color_picker.g = tools.color_list.g;
+        tools.color_picker.b = tools.color_list.b;
+        tools.color_picker.x = tools.color_list.r * 255;
+        tools.color_picker.y = tools.color_list.g * 255;
+        tools.color_picker.adjustment->set_value(tools.color_list.b * 255);
+        tools.color_picker.drawing_area.queue_draw();
     }
 
     return true;
