@@ -69,6 +69,7 @@ void Canvas::on_stylus_down(double x, double y) {
     modeler.Update(input, smoothed_stroke);
     switch (drawings->tools->type) {
         case Tools::PEN:
+            drawings->clear_pencil_data();
             drawings->pen(smoothed_stroke);
             break;
         case Tools::PENCIL:

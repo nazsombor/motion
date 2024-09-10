@@ -82,7 +82,7 @@ void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int
 void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
     auto cr = Cairo::Context::create(frames[frameIndex].surface);
 
-    for (int i = 1; i < stroke.size(); i++) {
+    for (int i = stroke_index + 1; i < stroke.size(); i++) {
         auto a = stroke[i - 1];
         auto b = stroke[i];
         double dX = (b.position.x - a.position.x) / 5;
@@ -90,10 +90,13 @@ void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
         double dP = (b.pressure - a.pressure) / 5;
 
         for (int j = 0; j < 5; j++) {
-            cr->arc(a.position.x + j * dX, a.position.y + j * dY, (a.pressure + j * dP) * 5, 0, 2 * M_PI);
+            cr->arc(a.position.x + j * dX, a.position.y + j * dY, (a.pressure + j * dP) * (a.pressure + j * dP) * 2, 0, 2 * M_PI);
             cr->fill();
         }
     }
+
+    stroke_index = stroke.size() - 1;
+
     std::cout << "pen " << stroke.size() << std::endl;
 }
 
