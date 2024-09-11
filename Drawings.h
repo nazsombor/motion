@@ -11,7 +11,7 @@
 
 class Frame {
     public:
-    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2;
+    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin;
     Frame();
 };
 
@@ -26,7 +26,7 @@ public:
     int frameIndex = 0;
     gint64 frame_duration = 1000000 / 12;
     gint64 previous_frame_time = 0;
-    bool play = false;
+    bool play = false, stop_playing = false;
     Tools * tools;
 
     Drawings(Tools &tools);
@@ -52,5 +52,7 @@ public:
     unsigned char *pixel(int x, int y);
 
     unsigned char * pixel2(int x, int y);
+
+    void onion_skin();
 };
 #endif //DRAWINGS_H

@@ -148,11 +148,15 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     }
 
     if (drawings.play) {
+        drawings.stop_playing = true;
         if (clock->get_frame_time() - drawings.previous_frame_time > drawings.frame_duration) {
             drawings.previous_frame_time = clock->get_frame_time();
             drawings.play_next();
             canvas.queue_draw();
         }
+    } else if (drawings.stop_playing) {
+        drawings.stop_playing = false;
+        canvas.queue_draw();
     }
 
     if (tools.color_list.update_color_picker) {

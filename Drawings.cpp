@@ -7,6 +7,7 @@
 Frame::Frame() {
     surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    onion_skin = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
 }
 
 int Drawings::index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, int stride, int j, int x, int y) {
@@ -73,6 +74,10 @@ void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int
     auto w = (double) width / 1920;
     auto h = (double) height / 1080;
     cr->scale(w, h);
+    if (!play) {
+        cr->set_source(frames[frameIndex].onion_skin, 0, 0);
+        cr->paint();
+    }
     cr->set_source(frames[frameIndex].surface2, 0, 0);
     cr->paint();
     cr->set_source(frames[frameIndex].surface, 0, 0);
@@ -194,12 +199,14 @@ void Drawings::step_forward() {
         frameIndex++;
         frames.emplace_back();
     }
+    onion_skin();
 }
 
 void Drawings::step_backward() {
     if (frameIndex > 0) {
         frameIndex--;
     }
+    onion_skin();
 }
 
 void Drawings::play_next() {
@@ -351,4 +358,37 @@ unsigned char *Drawings::pixel2(int x, int y) {
     int stride = frames[frameIndex].surface2->get_stride();
     int index = (stride * y) + (4 * x);
     return frames[frameIndex].surface2->get_data() + index;
+}
+
+void Drawings::onion_skin() {
+    auto s = frames[frameIndex].onion_skin;
+    bool there_is_previous = frameIndex > 0;
+    bool there_is_next = frameIndex < frames.size() - 1;
+    s->flush();
+
+    for (int i = 0; i < s->get_stride() * s->get_height(); i += 4) {
+        unsigned char *data = &s->get_data()[i];
+        data[0] = 0;
+        data[1] = 0;
+        data[2] = 0;
+        data[3] = 0;
+
+        if (there_is_previous) {
+            auto d2 = &frames[frameIndex - 1].surface->get_data()[i];
+            if (d2[3] != 0) {
+                data[0] = 255;
+                data[3] = 100;
+            }
+        }
+        if (there_is_next) {
+            auto d2 = &frames[frameIndex + 1].surface->get_data()[i];
+            if (d2[3] != 0) {
+                data[1] = 255;
+                data[3] = 100;
+            }
+        }
+    }
+
+    s->mark_dirty(0, 0, s->get_width(), s->get_height());
+
 }
