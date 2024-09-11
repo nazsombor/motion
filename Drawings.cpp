@@ -273,7 +273,7 @@ void Drawings::fill_area(int x, int y) {
 
             if (right) {
                 if (a[0] == check_color[0] && a[1] == check_color[1] && a[2] == check_color[2] && a[3] == check_color[
-                        3] && a2[3] == 0) {
+                        3] && a2[3] == 0 && points[i].please_continue == 0) {
                     points.emplace_back(points[i].x + 1, points[i].y, 0);
                 } else {
                     auto j = 1;
@@ -288,7 +288,7 @@ void Drawings::fill_area(int x, int y) {
 
             if (down) {
                 if (b[0] == check_color[0] && b[1] == check_color[1] && b[2] == check_color[2] && b[3] == check_color[
-                        3] && b2[3] == 0) {
+                        3] && b2[3] == 0 && points[i].please_continue == 0) {
                     if (points[i].y + 1 < 1080)
                         points.emplace_back(points[i].x, points[i].y + 1, 0);
                 } else {
@@ -305,7 +305,7 @@ void Drawings::fill_area(int x, int y) {
 
             if (up) {
                 if (c[0] == check_color[0] && c[1] == check_color[1] && c[2] == check_color[2] && c[3] == check_color[
-                        3] && c2[3] == 0) {
+                        3] && c2[3] == 0 && points[i].please_continue == 0) {
                     if (points[i].y - 1 >= 0)
                         points.emplace_back(points[i].x, points[i].y - 1, 0);
                 } else {
@@ -321,7 +321,7 @@ void Drawings::fill_area(int x, int y) {
 
             if (left) {
                 if (d[0] == check_color[0] && d[1] == check_color[1] && d[2] == check_color[2] && d[3] == check_color[
-                        3] && d2[3] == 0) {
+                        3] && d2[3] == 0 && points[i].please_continue == 0) {
                     points.emplace_back(points[i].x - 1, points[i].y, 0);
                 } else {
                     auto j = 1;
