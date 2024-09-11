@@ -90,7 +90,8 @@ void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
         double dP = (b.pressure - a.pressure) / 5;
 
         for (int j = 0; j < 5; j++) {
-            cr->arc(a.position.x + j * dX, a.position.y + j * dY, (a.pressure + j * dP) * (a.pressure + j * dP) * 2, 0, 2 * M_PI);
+            cr->arc(a.position.x + j * dX, a.position.y + j * dY, (a.pressure + j * dP) * (a.pressure + j * dP) * 2, 0,
+                    2 * M_PI);
             cr->fill();
         }
     }
@@ -107,7 +108,7 @@ void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
     unsigned char *data = frames[frameIndex].surface->get_data();
     int stride = frames[frameIndex].surface->get_stride();
 
-    std::cout << "pencil " << stroke.size() <<  std::endl;
+    std::cout << "pencil " << stroke.size() << std::endl;
 
     for (int i = stroke_index + 1; i < stroke.size(); i++) {
         auto a = stroke[i - 1];
@@ -225,7 +226,7 @@ void Drawings::fill_area(int x, int y) {
         (unsigned char) (tools->color_picker.b * 256), (unsigned char) (tools->color_picker.g * 256),
         (unsigned char) (tools->color_picker.r * 256), 255
     };
-    std::memcpy(check_color, pixel(x, y), sizeof(check_color));
+    std::memcpy(check_color, pixel2(x, y), sizeof(check_color));
 
     std::cout << "check_color: " << (int) check_color[0] << " " << (int) check_color[1] << " " << (int) check_color[2]
             << " " << (int) check_color[3] << " " << std::endl;
@@ -238,7 +239,7 @@ void Drawings::fill_area(int x, int y) {
 
     while (!points.empty()) {
         for (int i = points.size() - 1; i >= 0; i--) {
-            auto p = pixel(points[i].x, points[i].y);
+            auto p = pixel2(points[i].x, points[i].y);
 
             if (p[0] == fill_color[0] && p[1] == fill_color[1] && p[2] == fill_color[2] && p[3] == fill_color[3]) {
                 points.erase(points.begin() + i);
@@ -259,14 +260,20 @@ void Drawings::fill_area(int x, int y) {
                     points[i].x <= 1920;
 
 
-            auto a = pixel(points[i].x + 1, points[i].y);
-            auto b = pixel(points[i].x, points[i].y + 1);
-            auto c = pixel(points[i].x, points[i].y - 1);
-            auto d = pixel(points[i].x - 1, points[i].y);
+            auto a = pixel2(points[i].x + 1, points[i].y);
+            auto b = pixel2(points[i].x, points[i].y + 1);
+            auto c = pixel2(points[i].x, points[i].y - 1);
+            auto d = pixel2(points[i].x - 1, points[i].y);
+
+            auto a2 = pixel(points[i].x + 1, points[i].y);
+            auto b2 = pixel(points[i].x, points[i].y + 1);
+            auto c2 = pixel(points[i].x, points[i].y - 1);
+            auto d2 = pixel(points[i].x - 1, points[i].y);
+
 
             if (right) {
                 if (a[0] == check_color[0] && a[1] == check_color[1] && a[2] == check_color[2] && a[3] == check_color[
-                        3]) {
+                        3] && a2[3] == 0) {
                     points.emplace_back(points[i].x + 1, points[i].y, 0);
                 } else {
                     auto j = 1;
@@ -281,7 +288,7 @@ void Drawings::fill_area(int x, int y) {
 
             if (down) {
                 if (b[0] == check_color[0] && b[1] == check_color[1] && b[2] == check_color[2] && b[3] == check_color[
-                        3]) {
+                        3] && b2[3] == 0) {
                     if (points[i].y + 1 < 1080)
                         points.emplace_back(points[i].x, points[i].y + 1, 0);
                 } else {
@@ -298,7 +305,7 @@ void Drawings::fill_area(int x, int y) {
 
             if (up) {
                 if (c[0] == check_color[0] && c[1] == check_color[1] && c[2] == check_color[2] && c[3] == check_color[
-                        3]) {
+                        3] && c2[3] == 0) {
                     if (points[i].y - 1 >= 0)
                         points.emplace_back(points[i].x, points[i].y - 1, 0);
                 } else {
@@ -314,7 +321,7 @@ void Drawings::fill_area(int x, int y) {
 
             if (left) {
                 if (d[0] == check_color[0] && d[1] == check_color[1] && d[2] == check_color[2] && d[3] == check_color[
-                        3]) {
+                        3] && d2[3] == 0) {
                     points.emplace_back(points[i].x - 1, points[i].y, 0);
                 } else {
                     auto j = 1;
@@ -335,6 +342,12 @@ void Drawings::fill_area(int x, int y) {
 }
 
 unsigned char *Drawings::pixel(int x, int y) {
+    int stride = frames[frameIndex].surface->get_stride();
+    int index = (stride * y) + (4 * x);
+    return frames[frameIndex].surface->get_data() + index;
+}
+
+unsigned char *Drawings::pixel2(int x, int y) {
     int stride = frames[frameIndex].surface2->get_stride();
     int index = (stride * y) + (4 * x);
     return frames[frameIndex].surface2->get_data() + index;

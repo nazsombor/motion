@@ -49,6 +49,8 @@ public:
 
     void fill_area(int x, int y);
 
-    unsigned char * pixel(int x, int y);
+    unsigned char *pixel(int x, int y);
+
+    unsigned char * pixel2(int x, int y);
 };
 #endif //DRAWINGS_H
