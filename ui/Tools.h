@@ -13,14 +13,14 @@
 
 class Tools : public Gtk::Box{
 public:
-    enum Type {PEN, PENCIL, ERASER, SOLID_BRUSH, TEXTURED_BRUSH};
+    enum Type {PEN, PENCIL, SOLID_BRUSH, TEXTURED_BRUSH, COLOR_PICKER_TOOL};
     Type type = PEN;
     Gtk::Box tools_box;
     Gtk::Button pen;
     Gtk::Button pencil;
-    Gtk::Button eraser;
     Gtk::Button solid_brush;
     Gtk::Button textured_brush;
+    Gtk::Button color_picker_tool;
     ColorList   color_list;
     CurrentColor current_color;
     ColorPicker color_picker;
@@ -32,7 +32,7 @@ public:
 
     void select_pencil();
 
-    void select_eraser();
+    void select_color_picker_tool();
 
     void select_solid_brush();
 

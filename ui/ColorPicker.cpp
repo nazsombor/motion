@@ -24,6 +24,9 @@ ColorPicker::ColorPicker(CurrentColor *current_color) : adjustment(Gtk::Adjustme
     click->signal_pressed().connect(sigc::mem_fun(*this, &ColorPicker::on_click));
     drawing_area.add_controller(click);
     this->current_color = current_color;
+    current_color->r = r;
+    current_color->g = g;
+    current_color->b = b;
 
 }
 
@@ -48,6 +51,7 @@ void ColorPicker::on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int
 void ColorPicker::on_adjustment_changed() {
     drawing_area.queue_draw();
     current_color->update_color(x, y, adjustment->get_value());
+    b = adjustment->get_value() / 256.0;
 }
 
 void ColorPicker::on_click(int count, double x, double y) {

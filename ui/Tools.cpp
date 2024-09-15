@@ -15,22 +15,21 @@ Tools::Tools() : current_color(&color_list), color_picker(&current_color){
     tools_box.set_orientation(Gtk::Orientation::HORIZONTAL);
     tools_box.append(pen);
     tools_box.append(pencil);
-    tools_box.append(eraser);
     tools_box.append(solid_brush);
     tools_box.append(textured_brush);
+    tools_box.append(color_picker_tool);
 
     pen.set_label("pen");
     pencil.set_label("pencil");
-    eraser.set_label("eraser");
     solid_brush.set_label("solid brush");
     textured_brush.set_label("textured brush");
+    color_picker_tool.set_label("color picker");
 
     pen.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_pen));
     pencil.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_pencil));
-    eraser.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_eraser));
+    color_picker_tool.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_color_picker_tool));
     solid_brush.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_solid_brush));
     textured_brush.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_textured_brush));
-
 
 
     switch(type) {
@@ -40,8 +39,8 @@ Tools::Tools() : current_color(&color_list), color_picker(&current_color){
         case PENCIL:
             select_pencil();
             break;
-        case ERASER:
-            select_eraser();
+        case COLOR_PICKER_TOOL:
+            select_color_picker_tool();
             break;
         case SOLID_BRUSH:
             select_solid_brush();
@@ -57,7 +56,7 @@ void Tools::select_pen() {
     type = PEN;
     pen.add_css_class("selected-tool");
     pencil.remove_css_class("selected-tool");
-    eraser.remove_css_class("selected-tool");
+    color_picker_tool.remove_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
     solid_brush_selected = false;
@@ -67,17 +66,17 @@ void Tools::select_pencil() {
     type = PENCIL;
     pen.remove_css_class("selected-tool");
     pencil.add_css_class("selected-tool");
-    eraser.remove_css_class("selected-tool");
+    color_picker_tool.remove_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
     solid_brush_selected = false;
 }
 
-void Tools::select_eraser() {
-    type = ERASER;
+void Tools::select_color_picker_tool() {
+    type = COLOR_PICKER_TOOL;
     pen.remove_css_class("selected-tool");
     pencil.remove_css_class("selected-tool");
-    eraser.add_css_class("selected-tool");
+    color_picker_tool.add_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
     solid_brush_selected = false;
@@ -87,7 +86,7 @@ void Tools::select_solid_brush() {
     type = SOLID_BRUSH;
     pen.remove_css_class("selected-tool");
     pencil.remove_css_class("selected-tool");
-    eraser.remove_css_class("selected-tool");
+    color_picker_tool.remove_css_class("selected-tool");
     solid_brush.add_css_class("selected-tool");
     textured_brush.remove_css_class("selected-tool");
     solid_brush_selected = true;
@@ -97,7 +96,7 @@ void Tools::select_textured_brush() {
     type = TEXTURED_BRUSH;
     pen.remove_css_class("selected-tool");
     pencil.remove_css_class("selected-tool");
-    eraser.remove_css_class("selected-tool");
+    color_picker_tool.remove_css_class("selected-tool");
     solid_brush.remove_css_class("selected-tool");
     textured_brush.add_css_class("selected-tool");
     solid_brush_selected = false;

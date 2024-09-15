@@ -4,9 +4,6 @@
 
 #include "Cairomotion.h"
 
-#include "ui/Placeholder.h"
-#include "ui/PopupBar.h"
-
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
     auto r = 1920.0 / canvas.get_width() ;
@@ -59,7 +56,7 @@ Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
     c1.add_css_class("center-container");
     tools.pen.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.pencil.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    tools.eraser.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.color_picker_tool.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.solid_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.textured_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.color_list.get_style_context()->add_provider(style,GTK_STYLE_PROVIDER_PRIORITY_USER);
