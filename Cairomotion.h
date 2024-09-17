@@ -11,10 +11,10 @@
 #include "Drawings.h"
 #include "ui/Placeholder.h"
 #include "ui/PopupBar.h"
+#include "ui/Tools.h"
 #include "ui/Canvas.h"
 #include "ui/CanvasContainer.h"
 #include "ui/ScrolledWidget.h"
-#include "ui/Tools.h"
 
 class Cairomotion : public Gtk::Window {
     Placeholder p1, p2;

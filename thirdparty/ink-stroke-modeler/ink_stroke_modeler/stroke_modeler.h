@@ -51,12 +51,12 @@ class StrokeModeler {
   // Clears any in-progress stroke, and initializes (or re-initializes) the
   // model with the given parameters. Returns an error if the parameters are
   // invalid.
-  absl::GoogleStatus Reset(const StrokeModelParams& stroke_model_params);
+  absl::Status Reset(const StrokeModelParams& stroke_model_params);
 
   // Clears any in-progress stroke, keeping the same model parameters.
   // Returns an error if the model has not yet been initialized via
   // Reset(StrokeModelParams).
-  absl::GoogleStatus Reset();
+  absl::Status Reset();
 
   // Updates the model with a raw input, and appends newly generated Results
   // to the results vector. Any previously generated Result values remain valid.
@@ -76,7 +76,7 @@ class StrokeModeler {
   // If this does not return an error, results will contain at least one Result,
   // and potentially more than one if the inputs are slower than the minimum
   // output rate.
-  absl::GoogleStatus Update(const Input& input, std::vector<Result>& results);
+  absl::Status Update(const Input& input, std::vector<Result>& results);
 
   // Models the given input prediction without changing the internal model
   // state, and then clears and fills the results parameter with the new
@@ -89,7 +89,7 @@ class StrokeModeler {
   //
   // The output is limited to results where the predictor has sufficient
   // confidence.
-  absl::GoogleStatus Predict(std::vector<Result>& results);
+  absl::Status Predict(std::vector<Result>& results);
 
   // Saves the current modeler state.
   //
@@ -107,11 +107,11 @@ class StrokeModeler {
  private:
   void ResetInternal();
 
-  absl::GoogleStatus ProcessDownEvent(const Input& input,
+  absl::Status ProcessDownEvent(const Input& input,
                                 std::vector<Result>& results);
-  absl::GoogleStatus ProcessMoveEvent(const Input& input,
+  absl::Status ProcessMoveEvent(const Input& input,
                                 std::vector<Result>& results);
-  absl::GoogleStatus ProcessUpEvent(const Input& input, std::vector<Result>& results);
+  absl::Status ProcessUpEvent(const Input& input, std::vector<Result>& results);
 
   std::unique_ptr<InputPredictor> predictor_;
 

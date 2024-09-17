@@ -6,6 +6,7 @@
 #define CURRENTCOLOR_H
 #include <gtkmm.h>
 #include <X11/Xlib.h>
+#undef Status
 
 #include "ColorList.h"
 

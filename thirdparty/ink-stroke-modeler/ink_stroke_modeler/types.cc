@@ -40,7 +40,7 @@ std::string ToFormattedString(Vec2 vec) {
   return absl::StrCat("(", vec.x, ", ", vec.y, ")");
 }
 
-absl::GoogleStatus ValidateInput(const Input &input) {
+absl::Status ValidateInput(const Input &input) {
   switch (input.event_type) {
     case Input::EventType::kUp:
     case Input::EventType::kMove:

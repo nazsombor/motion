@@ -3,8 +3,9 @@
 //
 
 #include "Cairomotion.h"
-
+#define Status int
 #include <X11/Xutil.h>
+
 
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();

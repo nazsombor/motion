@@ -40,7 +40,7 @@ constexpr int kMaxEndOfStrokeMaxIterations = 1000;
 
 }  // namespace
 
-absl::GoogleStatus ValidatePositionModelerParams(
+absl::Status ValidatePositionModelerParams(
     const PositionModelerParams& params) {
   RETURN_IF_ERROR(
       ValidateGreaterThanZero(params.spring_mass_constant,
@@ -49,7 +49,7 @@ absl::GoogleStatus ValidatePositionModelerParams(
                                  "PositionModelerParams::drag_ratio");
 }
 
-absl::GoogleStatus ValidateSamplingParams(const SamplingParams& params) {
+absl::Status ValidateSamplingParams(const SamplingParams& params) {
   RETURN_IF_ERROR(ValidateGreaterThanZero(params.min_output_rate,
                                           "SamplingParams::min_output_rate"));
   RETURN_IF_ERROR(ValidateGreaterThanZero(
@@ -80,13 +80,13 @@ absl::GoogleStatus ValidateSamplingParams(const SamplingParams& params) {
   return absl::OkStatus();
 }
 
-absl::GoogleStatus ValidateStylusStateModelerParams(
+absl::Status ValidateStylusStateModelerParams(
     const StylusStateModelerParams& params) {
   return ValidateGreaterThanZero(params.max_input_samples,
                                  "StylusStateModelerParams::max_input_samples");
 }
 
-absl::GoogleStatus ValidateWobbleSmootherParams(const WobbleSmootherParams& params) {
+absl::Status ValidateWobbleSmootherParams(const WobbleSmootherParams& params) {
   RETURN_IF_ERROR(ValidateGreaterThanOrEqualToZero(
       params.timeout.Value(), "WobbleSmootherParams::timeout"));
   RETURN_IF_ERROR(ValidateGreaterThanOrEqualToZero(
@@ -105,7 +105,7 @@ absl::GoogleStatus ValidateWobbleSmootherParams(const WobbleSmootherParams& para
 
 namespace {
 
-absl::GoogleStatus ValidateKalmanPredictorParams(
+absl::Status ValidateKalmanPredictorParams(
     const KalmanPredictorParams& kalman_params) {
   RETURN_IF_ERROR(ValidateGreaterThanZero(
       kalman_params.process_noise, "KalmanPredictorParams::process_noise"));
@@ -168,7 +168,7 @@ absl::GoogleStatus ValidateKalmanPredictorParams(
 
 }  // namespace
 
-absl::GoogleStatus ValidatePredictionParams(const PredictionParams& params) {
+absl::Status ValidatePredictionParams(const PredictionParams& params) {
   if (const auto* kalman_params = std::get_if<KalmanPredictorParams>(&params)) {
     return ValidateKalmanPredictorParams(*kalman_params);
   }
@@ -178,7 +178,7 @@ absl::GoogleStatus ValidatePredictionParams(const PredictionParams& params) {
   return absl::OkStatus();
 }
 
-absl::GoogleStatus ValidateStrokeModelParams(const StrokeModelParams& params) {
+absl::Status ValidateStrokeModelParams(const StrokeModelParams& params) {
   RETURN_IF_ERROR(ValidateWobbleSmootherParams(params.wobble_smoother_params));
   RETURN_IF_ERROR(
       ValidatePositionModelerParams(params.position_modeler_params));

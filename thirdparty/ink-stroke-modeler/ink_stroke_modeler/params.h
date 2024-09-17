@@ -235,13 +235,13 @@ struct StrokeModelParams {
 
 // These validation functions will return an error if the given parameters are
 // invalid.
-absl::GoogleStatus ValidatePositionModelerParams(const PositionModelerParams& params);
-absl::GoogleStatus ValidateSamplingParams(const SamplingParams& params);
-absl::GoogleStatus ValidateStylusStateModelerParams(
+absl::Status ValidatePositionModelerParams(const PositionModelerParams& params);
+absl::Status ValidateSamplingParams(const SamplingParams& params);
+absl::Status ValidateStylusStateModelerParams(
     const StylusStateModelerParams& params);
-absl::GoogleStatus ValidateWobbleSmootherParams(const WobbleSmootherParams& params);
-absl::GoogleStatus ValidatePredictionParams(const PredictionParams& params);
-absl::GoogleStatus ValidateStrokeModelParams(const StrokeModelParams& params);
+absl::Status ValidateWobbleSmootherParams(const WobbleSmootherParams& params);
+absl::Status ValidatePredictionParams(const PredictionParams& params);
+absl::Status ValidateStrokeModelParams(const StrokeModelParams& params);
 
 }  // namespace stroke_model
 }  // namespace ink

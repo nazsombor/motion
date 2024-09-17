@@ -6,7 +6,7 @@
 #include "absl/strings/substitute.h"
 
 template <typename T>
-absl::GoogleStatus ValidateIsFiniteNumber(T value, absl::string_view label) {
+absl::Status ValidateIsFiniteNumber(T value, absl::string_view label) {
   // std::isnan(integer value) fails to compile with Lexan C++20
   // (b/329239835), so only call std::isnan for floating point values.
   if constexpr (std::is_floating_point_v<T>) {
@@ -22,9 +22,9 @@ absl::GoogleStatus ValidateIsFiniteNumber(T value, absl::string_view label) {
 }
 
 template <typename T>
-absl::GoogleStatus ValidateGreaterThanZero(T value, absl::string_view label) {
+absl::Status ValidateGreaterThanZero(T value, absl::string_view label) {
   if constexpr (std::is_floating_point_v<T>) {
-    if (absl::GoogleStatus status = ValidateIsFiniteNumber(value, label);
+    if (absl::Status status = ValidateIsFiniteNumber(value, label);
         !status.ok()) {
       return status;
     }
@@ -37,9 +37,9 @@ absl::GoogleStatus ValidateGreaterThanZero(T value, absl::string_view label) {
 }
 
 template <typename T>
-absl::GoogleStatus ValidateGreaterThanOrEqualToZero(T value,
+absl::Status ValidateGreaterThanOrEqualToZero(T value,
                                               absl::string_view label) {
-  if (absl::GoogleStatus status = ValidateIsFiniteNumber(value, label);
+  if (absl::Status status = ValidateIsFiniteNumber(value, label);
       !status.ok()) {
     return status;
   }
