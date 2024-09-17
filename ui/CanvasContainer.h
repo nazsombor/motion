@@ -10,14 +10,11 @@
 class CanvasContainer : public Gtk::CenterBox{
 public:
     CanvasContainer() {
-        std::cout << "Hello World" << std::endl;
     }
 protected:
 
 
     void size_allocate_vfunc(int width, int height, int baseline) override {
-        std::cout << "..." << std::endl;
-
         Gtk::Widget::size_allocate_vfunc(width, height, baseline);
     }
 };
