@@ -29,6 +29,8 @@ public:
     void on_adjustment_changed();
 
     void on_click(int count, double x, double y);
+
+    void update(int r, int g, int b);
 };
 
 

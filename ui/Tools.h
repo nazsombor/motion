@@ -20,7 +20,6 @@ public:
     Gtk::Button pencil;
     Gtk::Button solid_brush;
     Gtk::Button textured_brush;
-    Gtk::Button color_picker_tool;
     ColorList   color_list;
     CurrentColor current_color;
     ColorPicker color_picker;
@@ -31,8 +30,6 @@ public:
     void select_pen();
 
     void select_pencil();
-
-    void select_color_picker_tool();
 
     void select_solid_brush();
 

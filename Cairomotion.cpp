@@ -4,11 +4,13 @@
 
 #include "Cairomotion.h"
 
+#include <X11/Xutil.h>
+
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
-    auto r = 1920.0 / canvas.get_width() ;
+    auto r = 1920.0 / canvas.get_width();
 
-    switch(button) {
+    switch (button) {
         case GDK_BUTTON_MIDDLE: {
             std::cout << "Middle stylus button" << std::endl;
             if (tools.solid_brush_selected) {
@@ -56,7 +58,6 @@ Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
     c1.add_css_class("center-container");
     tools.pen.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.pencil.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    tools.color_picker_tool.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.solid_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.textured_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.color_list.get_style_context()->add_provider(style,GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -69,7 +70,8 @@ Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
     gc = Gtk::GestureClick::create();
     gc->set_button(0);
     gc->signal_released().connect(sigc::mem_fun(*this, &Cairomotion::on_click));
-    canvas.add_controller(gc); //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
+    canvas.add_controller(gc);
+    //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
 
     eck = Gtk::EventControllerKey::create();
     eck->signal_key_released().connect(sigc::mem_fun(*this, &Cairomotion::on_key_released));
@@ -92,8 +94,9 @@ void Cairomotion::size_allocate_vfunc(int width, int height, int baseline) {
 
 void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) {
     std::cout << key << std::endl;
-    switch(key) {
-        case 65480: { // F11
+    switch (key) {
+        case 65480: {
+            // F11
             if (is_window_fullscreen) {
                 canvas.resize(0, 0);
                 unfullscreen();
@@ -104,12 +107,14 @@ void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) 
             }
             break;
         }
-        case 65363: { //Right arrow
+        case 65363: {
+            //Right arrow
             drawings.step_forward();
             canvas.queue_draw();
             break;
         }
-        case 65361: { //Left arrow
+        case 65361: {
+            //Left arrow
             drawings.step_backward();
             canvas.queue_draw();
             break;
@@ -131,7 +136,7 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         allow_canvas_resize_once_per_window_resize) {
         canvas.resize(c1.get_width(), c1.get_height());
         allow_canvas_resize_once_per_window_resize = false;
-        }
+    }
     if (popup_visibility_changed) {
         popup_visibility_changed = false;
         popup_visibility_change_timer = clock->get_frame_time();
@@ -141,7 +146,6 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         allow_canvas_resize_just_after_toogling_popups) {
         canvas.resize(c1.get_width(), c1.get_height());
         allow_canvas_resize_just_after_toogling_popups = false;
-
     }
 
     if (drawings.play) {
@@ -165,6 +169,43 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         tools.color_picker.y = tools.color_list.g * 255;
         tools.color_picker.adjustment->set_value(tools.color_list.b * 255);
         tools.color_picker.drawing_area.queue_draw();
+    }
+
+    if (tools.current_color.pick_button_clicked) {
+
+        XQueryPointer(
+            tools.current_color.display,
+            tools.current_color.window,
+            &tools.current_color.event.xbutton.root,
+            &tools.current_color.event.xbutton.subwindow,
+            &tools.current_color.event.xbutton.x_root,
+            &tools.current_color.event.xbutton.y_root,
+            &tools.current_color.event.xbutton.x,
+            &tools.current_color.event.xbutton.y,
+            &tools.current_color.event.xbutton.state
+        );
+
+        if (tools.current_color.event.xbutton.state == 256) {
+
+            tools.current_color.pick_button_clicked = false;
+
+            XImage *image1;
+            image1 = XGetImage(tools.current_color.display, tools.current_color.window, 0, 0,
+                               tools.current_color.attributes.width, tools.current_color.attributes.height,
+                               AllPlanes, ZPixmap);
+
+            XColor color;
+            color.pixel = XGetPixel(image1, tools.current_color.event.xbutton.x,
+                                    tools.current_color.event.xbutton.y);
+            XQueryColor(tools.current_color.display,
+                        XDefaultColormap(tools.current_color.display, 0), &color);
+            std::cout << color.red / 256 << " " << color.green / 256 << " " << color.blue / 256 << std::endl;
+
+            XFree(image1);
+
+            tools.color_picker.update(color.red / 256, color.green / 256, color.blue / 256);
+
+        }
     }
 
     return true;

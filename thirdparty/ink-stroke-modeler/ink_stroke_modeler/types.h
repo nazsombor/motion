@@ -176,7 +176,7 @@ struct Input {
 bool operator==(const Input &lhs, const Input &rhs);
 bool operator!=(const Input &lhs, const Input &rhs);
 
-absl::Status ValidateInput(const Input &input);
+absl::GoogleStatus ValidateInput(const Input &input);
 
 std::string ToFormattedString(Input::EventType event_type);
 

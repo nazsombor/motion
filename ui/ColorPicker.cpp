@@ -55,9 +55,15 @@ void ColorPicker::on_adjustment_changed() {
 }
 
 void ColorPicker::on_click(int count, double x, double y) {
-    std::cout << "Clicked at (" << x << ", " << y << ")" << std::endl;
     r = x / get_width(), g = y / get_height(), b = adjustment->get_value() / 256.0;
     this->x = x; this->y = y;
     current_color->update_color(x, y, adjustment->get_value());
     drawing_area.queue_draw();
+}
+
+void ColorPicker::update(int r, int g, int b) {
+    this->r = r / 255.0, this->g = g / 255.0, this->b = b / 255.0;
+    this->x = r;
+    this->y = g;
+    adjustment->set_value(b);
 }

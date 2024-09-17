@@ -54,7 +54,7 @@ void ModelStylus(const std::vector<TipState> &tip_states,
 
 }  // namespace
 
-absl::Status StrokeModeler::Reset(
+absl::GoogleStatus StrokeModeler::Reset(
     const StrokeModelParams &stroke_model_params) {
   if (auto status = ValidateStrokeModelParams(stroke_model_params);
       !status.ok()) {
@@ -86,7 +86,7 @@ absl::Status StrokeModeler::Reset(
   return absl::OkStatus();
 }
 
-absl::Status StrokeModeler::Reset() {
+absl::GoogleStatus StrokeModeler::Reset() {
   if (!stroke_model_params_.has_value()) {
     return absl::FailedPreconditionError(
         "Initial call to Reset must pass StrokeModelParams.");
@@ -100,14 +100,14 @@ void StrokeModeler::ResetInternal() {
   save_active_ = false;
 }
 
-absl::Status StrokeModeler::Update(const Input &input,
+absl::GoogleStatus StrokeModeler::Update(const Input &input,
                                    std::vector<Result> &results) {
   if (!stroke_model_params_.has_value()) {
     return absl::FailedPreconditionError(
         "Stroke model has not yet been initialized");
   }
 
-  if (absl::Status status = ValidateInput(input); !status.ok()) {
+  if (absl::GoogleStatus status = ValidateInput(input); !status.ok()) {
     return status;
   }
 
@@ -132,7 +132,7 @@ absl::Status StrokeModeler::Update(const Input &input,
   return absl::InvalidArgumentError("Invalid EventType.");
 }
 
-absl::Status StrokeModeler::Predict(std::vector<Result> &results) {
+absl::GoogleStatus StrokeModeler::Predict(std::vector<Result> &results) {
   results.clear();
 
   if (!stroke_model_params_.has_value()) {
@@ -156,7 +156,7 @@ absl::Status StrokeModeler::Predict(std::vector<Result> &results) {
   return absl::OkStatus();
 }
 
-absl::Status StrokeModeler::ProcessDownEvent(const Input &input,
+absl::GoogleStatus StrokeModeler::ProcessDownEvent(const Input &input,
                                              std::vector<Result> &result) {
   if (last_input_) {
     return absl::FailedPreconditionError(
@@ -196,7 +196,7 @@ absl::Status StrokeModeler::ProcessDownEvent(const Input &input,
   return absl::OkStatus();
 }
 
-absl::Status StrokeModeler::ProcessUpEvent(const Input &input,
+absl::GoogleStatus StrokeModeler::ProcessUpEvent(const Input &input,
                                            std::vector<Result> &results) {
   if (!last_input_) {
     return absl::FailedPreconditionError(
@@ -243,7 +243,7 @@ absl::Status StrokeModeler::ProcessUpEvent(const Input &input,
   return absl::OkStatus();
 }
 
-absl::Status StrokeModeler::ProcessMoveEvent(const Input &input,
+absl::GoogleStatus StrokeModeler::ProcessMoveEvent(const Input &input,
                                              std::vector<Result> &results) {
   if (!last_input_) {
     return absl::FailedPreconditionError(
