@@ -3,17 +3,15 @@
 //
 
 #include "Cairomotion.h"
-#define Status int
-#include <X11/Xutil.h>
+
 
 
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
-    auto r = 1920.0 / canvas.get_width();
 
     switch (button) {
         case GDK_BUTTON_MIDDLE: {
-            std::cout << "Middle stylus button" << std::endl;
+            auto r = 1920.0 / canvas.get_width();
             if (tools.solid_brush_selected) {
                 int x_int = r * x;
                 int y_int = r * y;
@@ -44,12 +42,14 @@ Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
                             p2(3000, 3000, Placeholder::YELLOW),
                             drawings(tools),
                             pb2(&c1, &tools, &canvas, PopupBar::LEFT),
-                            pb1(&pb2, &p1, &canvas, PopupBar::BOTTOM) {
+                            pb1(&pb2, &timeline, &canvas, PopupBar::BOTTOM) {
     canvas.set_valign(Gtk::Align::CENTER);
     canvas.set_content_width(600);
     canvas.set_content_height(300);
     canvas.drawings = &drawings;
     c1.set_center_widget(canvas);
+
+
 
     auto style = Gtk::CssProvider::create();
     style->load_from_data(R"(
@@ -124,6 +124,10 @@ void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) 
             drawings.play = !drawings.play;
             break;
         }
+        case 112: {
+            tools.current_color.pick_button_clicked = true;
+            break;
+        }
     }
 }
 
@@ -186,10 +190,11 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
             &tools.current_color.event.xbutton.state
         );
 
-        if (tools.current_color.event.xbutton.state == 256) {
+        std::cout << tools.current_color.event.xbutton.state << std::endl;
+
+        if (tools.current_color.event.xbutton.state & 256) {
 
             tools.current_color.pick_button_clicked = false;
-
             XImage *image1;
             image1 = XGetImage(tools.current_color.display, tools.current_color.window, 0, 0,
                                tools.current_color.attributes.width, tools.current_color.attributes.height,

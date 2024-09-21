@@ -15,6 +15,10 @@
 #include "ui/Canvas.h"
 #include "ui/CanvasContainer.h"
 #include "ui/ScrolledWidget.h"
+#include "ui/Timeline.h"
+
+#define Status int
+#include <X11/Xutil.h>
 
 class Cairomotion : public Gtk::Window {
     Placeholder p1, p2;
@@ -22,6 +26,7 @@ class Cairomotion : public Gtk::Window {
     ScrolledWidget sw1, sw2;
     CanvasContainer c1;
     Canvas canvas;
+    Timeline timeline;
     PopupBar pb2, pb1;
     Glib::RefPtr<Gtk::GestureClick> gc;
     Glib::RefPtr<Gtk::GestureStylus> gs;

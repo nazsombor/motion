@@ -9,10 +9,10 @@
 #include "thirdparty/ink-stroke-modeler/ink_stroke_modeler/types.h"
 #include "ui/Tools.h"
 
-class Frame {
+class Frame2 {
     public:
     Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin;
-    Frame();
+    Frame2();
 };
 
 
@@ -22,7 +22,7 @@ class Drawings {
     int index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, int stride, int j, int x, int y);
 
 public:
-    std::vector<Frame> frames;
+    std::vector<Frame2> frames;
     int frameIndex = 0;
     gint64 frame_duration = 1000000 / 12;
     gint64 previous_frame_time = 0;

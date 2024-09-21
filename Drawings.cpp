@@ -4,7 +4,7 @@
 
 #include "Drawings.h"
 
-Frame::Frame() {
+Frame2::Frame2() {
     surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     onion_skin = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
