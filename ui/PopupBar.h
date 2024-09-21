@@ -13,10 +13,10 @@
 
 class PopupBar : public Gtk::Box {
 public:
-    enum Align {LEFT, BOTTOM};
+    enum Alignment {LEFT, BOTTOM};
 private:
-    Align alignment;
-    Gtk::Box b;
+    Alignment alignment;
+    Gtk::Box container;
     Placeholder p;
     ScrolledWidget sw;
     Gtk::Widget *space;
@@ -26,7 +26,7 @@ private:
     bool is_popup_visible = true;
 
 public:
-    PopupBar(Gtk::Widget *space, Gtk::Widget *popup, Canvas *canvas, Align align);
+    PopupBar(Gtk::Widget *space, Gtk::Widget *popup, Canvas *canvas, Alignment align);
 
     void mouse_enter(double x, double y);
 

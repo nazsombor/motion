@@ -7,16 +7,16 @@
 #include <iostream>
 
 Tools::Tools() : current_color(&color_list), color_picker(&current_color){
-    append(tools_box);
+    append(tools_container);
     append(color_picker);
     append(current_color);
     append(color_list);
     set_orientation(Gtk::Orientation::VERTICAL);
-    tools_box.set_orientation(Gtk::Orientation::HORIZONTAL);
-    tools_box.append(pen);
-    tools_box.append(pencil);
-    tools_box.append(solid_brush);
-    tools_box.append(textured_brush);
+    tools_container.set_orientation(Gtk::Orientation::HORIZONTAL);
+    tools_container.append(pen);
+    tools_container.append(pencil);
+    tools_container.append(solid_brush);
+    tools_container.append(textured_brush);
 
     pen.set_label("pen");
     pencil.set_label("pencil");

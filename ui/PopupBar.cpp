@@ -6,7 +6,7 @@
 
 #include "Placeholder.h"
 
-PopupBar::PopupBar(Gtk::Widget *spaceWidget, Gtk::Widget *popupWidget, Canvas *canvas, Align align) : p(30, 30, Placeholder::Color::BLUE){
+PopupBar::PopupBar(Gtk::Widget *spaceWidget, Gtk::Widget *popupWidget, Canvas *canvas, Alignment align) : p(30, 30, Placeholder::Color::BLUE){
     alignment = align;
     space = spaceWidget;
     popup = popupWidget;
@@ -17,19 +17,19 @@ PopupBar::PopupBar(Gtk::Widget *spaceWidget, Gtk::Widget *popupWidget, Canvas *c
         case BOTTOM:
             space->set_vexpand(true);
             set_orientation(Gtk::Orientation::VERTICAL);
-            b.set_orientation(Gtk::Orientation::VERTICAL);
-            b.append(sw);
-            b.append(p);
+            container.set_orientation(Gtk::Orientation::VERTICAL);
+            container.append(sw);
+            container.append(p);
             append(*space);
-            append(b);
+            append(container);
             break;
         case LEFT:
             space->set_hexpand(true);
             set_orientation(Gtk::Orientation::HORIZONTAL);
-            b.set_orientation(Gtk::Orientation::HORIZONTAL);
-            b.append(p);
-            b.append(sw);
-            append(b);
+            container.set_orientation(Gtk::Orientation::HORIZONTAL);
+            container.append(p);
+            container.append(sw);
+            append(container);
             append(*space);
             break;
     }
@@ -37,7 +37,7 @@ PopupBar::PopupBar(Gtk::Widget *spaceWidget, Gtk::Widget *popupWidget, Canvas *c
     ecm->signal_enter().connect(sigc::mem_fun(*this, &PopupBar::mouse_enter));
     ecm->signal_leave().connect(sigc::mem_fun(*this, &PopupBar::mouse_leave));
 
-    b.add_controller(ecm);
+    container.add_controller(ecm);
 }
 
 void PopupBar::mouse_enter(double x, double y) {

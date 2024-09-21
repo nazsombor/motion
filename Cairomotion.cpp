@@ -4,7 +4,43 @@
 
 #include "Cairomotion.h"
 
+Cairomotion::Cairomotion(): drawings(tools),
+                            pb2(&container, &tools, &canvas, PopupBar::LEFT),
+                            pb1(&pb2, &timeline, &canvas, PopupBar::BOTTOM) {
+    canvas.set_valign(Gtk::Align::CENTER);
+    canvas.drawings = &drawings;
+    container.set_center_widget(canvas);
 
+    auto style = Gtk::CssProvider::create();
+    style->load_from_data(R"(
+        .center-container {
+            background-color: #ccc; }
+.selected-tool { background: #00f; color: white;})");
+    Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), style, 0);
+    container.add_css_class("center-container");
+    tools.pen.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.pencil.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.solid_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.textured_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    tools.color_list.get_style_context()->add_provider(style,GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    gs = Gtk::GestureStylus::create();
+    canvas.setup_gesture_stylus(gs);
+
+    gc = Gtk::GestureClick::create();
+    gc->set_button(0);
+    gc->signal_released().connect(sigc::mem_fun(*this, &Cairomotion::on_click));
+    //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
+    canvas.add_controller(gc);
+
+    eck = Gtk::EventControllerKey::create();
+    eck->signal_key_released().connect(sigc::mem_fun(*this, &Cairomotion::on_key_released));
+    add_controller(eck);
+
+    set_default_size(1300, 900);
+    set_child(pb1);
+    add_tick_callback(sigc::mem_fun(*this, &Cairomotion::tick));
+}
 
 void Cairomotion::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
@@ -15,7 +51,6 @@ void Cairomotion::on_click(int type, double x, double y) {
             if (tools.solid_brush_selected) {
                 int x_int = r * x;
                 int y_int = r * y;
-                std::cout << x_int << " " << y_int << std::endl;
                 drawings.fill_area(x_int, y_int);
                 canvas.queue_draw();
             }
@@ -23,12 +58,10 @@ void Cairomotion::on_click(int type, double x, double y) {
             break;
         }
         case GDK_BUTTON_PRIMARY: {
-            std::cout << "Primary stylus button" << std::endl;
             canvas.stylus_up_is_not_primary_button = false;
             break;
         }
         case GDK_BUTTON_SECONDARY: {
-            std::cout << "Secondary stylus button" << std::endl;
             pb1.toogle_bar_visibility();
             pb2.toogle_bar_visibility();
             popup_visibility_changed = true;
@@ -38,49 +71,6 @@ void Cairomotion::on_click(int type, double x, double y) {
     }
 }
 
-Cairomotion::Cairomotion(): p1(3000, 3000, Placeholder::RED),
-                            p2(3000, 3000, Placeholder::YELLOW),
-                            drawings(tools),
-                            pb2(&c1, &tools, &canvas, PopupBar::LEFT),
-                            pb1(&pb2, &timeline, &canvas, PopupBar::BOTTOM) {
-    canvas.set_valign(Gtk::Align::CENTER);
-    canvas.set_content_width(600);
-    canvas.set_content_height(300);
-    canvas.drawings = &drawings;
-    c1.set_center_widget(canvas);
-
-
-
-    auto style = Gtk::CssProvider::create();
-    style->load_from_data(R"(
-        .center-container{ background-color: #ccc; }
-.selected-tool { background: #00f; color: white;})");
-    Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), style, 0);
-    c1.add_css_class("center-container");
-    tools.pen.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    tools.pencil.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    tools.solid_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    tools.textured_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
-    tools.color_list.get_style_context()->add_provider(style,GTK_STYLE_PROVIDER_PRIORITY_USER);
-    set_default_size(1300, 900);
-    set_child(pb1);
-
-    gs = Gtk::GestureStylus::create();
-    canvas.setup_gesture_stylus(gs);
-
-    gc = Gtk::GestureClick::create();
-    gc->set_button(0);
-    gc->signal_released().connect(sigc::mem_fun(*this, &Cairomotion::on_click));
-    canvas.add_controller(gc);
-    //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
-
-    eck = Gtk::EventControllerKey::create();
-    eck->signal_key_released().connect(sigc::mem_fun(*this, &Cairomotion::on_key_released));
-    add_controller(eck);
-
-
-    add_tick_callback(sigc::mem_fun(*this, &Cairomotion::tick));
-}
 
 void Cairomotion::size_allocate_vfunc(int width, int height, int baseline) {
     if (window_width != width || window_height != height) {
@@ -121,6 +111,7 @@ void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) 
             break;
         }
         case 32: {
+            //Space
             drawings.play = !drawings.play;
             break;
         }
@@ -131,7 +122,7 @@ void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) 
     }
 }
 
-bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+void Cairomotion::handle_window_resize(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     if (start_window_size_change) {
         window_size_change_timer = clock->get_frame_time();
         start_window_size_change = false;
@@ -139,20 +130,22 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     }
     if ((clock->get_frame_time() - window_size_change_timer) > 250000 &&
         allow_canvas_resize_once_per_window_resize) {
-        canvas.resize(c1.get_width(), c1.get_height());
+        canvas.resize(container.get_width(), container.get_height());
         allow_canvas_resize_once_per_window_resize = false;
     }
     if (popup_visibility_changed) {
         popup_visibility_changed = false;
         popup_visibility_change_timer = clock->get_frame_time();
-        allow_canvas_resize_just_after_toogling_popups = true;
+        allow_canvas_resize_just_after_toggling_popups = true;
     }
     if ((clock->get_frame_time() - popup_visibility_change_timer > 250000) &&
-        allow_canvas_resize_just_after_toogling_popups) {
-        canvas.resize(c1.get_width(), c1.get_height());
-        allow_canvas_resize_just_after_toogling_popups = false;
+        allow_canvas_resize_just_after_toggling_popups) {
+        canvas.resize(container.get_width(), container.get_height());
+        allow_canvas_resize_just_after_toggling_popups = false;
     }
+}
 
+void Cairomotion::handle_play(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     if (drawings.play) {
         drawings.stop_playing = true;
         if (clock->get_frame_time() - drawings.previous_frame_time > drawings.frame_duration) {
@@ -164,7 +157,9 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         drawings.stop_playing = false;
         canvas.queue_draw();
     }
+}
 
+void Cairomotion::handle_update_color_picker() {
     if (tools.color_list.update_color_picker) {
         tools.color_list.update_color_picker = false;
         tools.color_picker.r = tools.color_list.r;
@@ -175,9 +170,10 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         tools.color_picker.adjustment->set_value(tools.color_list.b * 255);
         tools.color_picker.drawing_area.queue_draw();
     }
+}
 
+void Cairomotion::handle_pick_color_from_anywhere_the_screen() {
     if (tools.current_color.pick_button_clicked) {
-
         XQueryPointer(
             tools.current_color.display,
             tools.current_color.window,
@@ -189,8 +185,6 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
             &tools.current_color.event.xbutton.y,
             &tools.current_color.event.xbutton.state
         );
-
-        std::cout << tools.current_color.event.xbutton.state << std::endl;
 
         if (tools.current_color.event.xbutton.state & 256) {
 
@@ -213,6 +207,12 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
 
         }
     }
+}
 
+bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+    handle_window_resize(clock);
+    handle_play(clock);
+    handle_update_color_picker();
+    handle_pick_color_from_anywhere_the_screen();
     return true;
 }

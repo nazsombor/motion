@@ -22,11 +22,12 @@ class Canvas : public Gtk::DrawingArea{
     bool is_stylus_down = false;
 
 public:
-    Drawings * drawings;
+    Drawings *drawings;
     Glib::RefPtr<Gtk::GestureStylus> *gs;
     bool stylus_up_is_not_primary_button;
 
     Canvas();
+
     void resize(int width, int height);
 
     void on_draw(const Cairo::RefPtr<Cairo::Context>& cr, int width, int height);

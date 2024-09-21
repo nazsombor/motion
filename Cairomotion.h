@@ -9,25 +9,19 @@
 #include <iostream>
 
 #include "Drawings.h"
-#include "ui/Placeholder.h"
 #include "ui/PopupBar.h"
 #include "ui/Tools.h"
 #include "ui/Canvas.h"
 #include "ui/CanvasContainer.h"
-#include "ui/ScrolledWidget.h"
 #include "ui/Timeline.h"
 
-#define Status int
-#include <X11/Xutil.h>
-
 class Cairomotion : public Gtk::Window {
-    Placeholder p1, p2;
-    Tools tools;
-    ScrolledWidget sw1, sw2;
-    CanvasContainer c1;
     Canvas canvas;
+    Tools tools;
     Timeline timeline;
+    CanvasContainer container;
     PopupBar pb2, pb1;
+
     Glib::RefPtr<Gtk::GestureClick> gc;
     Glib::RefPtr<Gtk::GestureStylus> gs;
     Glib::RefPtr<Gtk::EventControllerKey> eck;
@@ -42,23 +36,35 @@ class Cairomotion : public Gtk::Window {
     gint64 window_size_change_timer = 0;
     bool popup_visibility_changed;
     gint64 popup_visibility_change_timer = 0;
-    bool allow_canvas_resize_just_after_toogling_popups;
+    bool allow_canvas_resize_just_after_toggling_popups = false;
 
     bool is_window_fullscreen = false;
 
-
-    void on_click(int type, double x, double y);
-
 public:
     Cairomotion();
+
+private:
+    void on_click(int type, double x, double y);
 
 protected:
     void size_allocate_vfunc(int width, int height, int baseline) override;
 
     void on_key_released(guint key, guint _, Gdk::ModifierType m_type);
 
+    void handle_window_resize(const Glib::RefPtr<Gdk::FrameClock> &clock);
+
+    void handle_play(const Glib::RefPtr<Gdk::FrameClock> &clock);
+
+    void handle_update_color_picker();
+
+    void handle_pick_color_from_anywhere_the_screen();
+
     bool tick(const Glib::RefPtr<Gdk::FrameClock> &clock);
 };
+
+#define Status int
+
+#include <X11/Xutil.h>
 
 
 #endif //CAIROMOTION_H

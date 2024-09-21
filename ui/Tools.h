@@ -11,11 +11,11 @@
 #include "CurrentColor.h"
 
 
-class Tools : public Gtk::Box{
+class Tools : public Gtk::Box {
 public:
-    enum Type {PEN, PENCIL, SOLID_BRUSH, TEXTURED_BRUSH, COLOR_PICKER_TOOL};
+    enum Type {PEN, PENCIL, SOLID_BRUSH, TEXTURED_BRUSH};
     Type type = PEN;
-    Gtk::Box tools_box;
+    Gtk::Box tools_container;
     Gtk::Button pen;
     Gtk::Button pencil;
     Gtk::Button solid_brush;
