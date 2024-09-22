@@ -6,20 +6,19 @@
 
 #include "Placeholder.h"
 
-PopupBar::PopupBar(Gtk::Widget *spaceWidget, Gtk::Widget *popupWidget, Canvas *canvas, Alignment align) : p(30, 30, Placeholder::Color::BLUE){
+PopupBar::PopupBar(Gtk::Widget *spaceWidget, Gtk::Widget *popupWidget, Canvas *canvas, Alignment align) : bar(30, 30, Placeholder::Color::BLUE){
     alignment = align;
     space = spaceWidget;
     popup = popupWidget;
     this->canvas = canvas;
-    sw.set_child(*popup);
-    sw.set_visible(false);
+    popup->set_visible(false);
     switch (alignment) {
         case BOTTOM:
             space->set_vexpand(true);
             set_orientation(Gtk::Orientation::VERTICAL);
             container.set_orientation(Gtk::Orientation::VERTICAL);
-            container.append(sw);
-            container.append(p);
+            container.append(*popup);
+            container.append(bar);
             append(*space);
             append(container);
             break;
@@ -27,8 +26,8 @@ PopupBar::PopupBar(Gtk::Widget *spaceWidget, Gtk::Widget *popupWidget, Canvas *c
             space->set_hexpand(true);
             set_orientation(Gtk::Orientation::HORIZONTAL);
             container.set_orientation(Gtk::Orientation::HORIZONTAL);
-            container.append(p);
-            container.append(sw);
+            container.append(bar);
+            container.append(*popup);
             append(container);
             append(*space);
             break;
@@ -44,16 +43,14 @@ void PopupBar::mouse_enter(double x, double y) {
     switch (alignment) {
         case BOTTOM: {
             canvas->resize(get_width(), get_height() - std::min(space->get_height() + 100, 800));
-            sw.set_visible();
-            sw.resize(get_width() - 20,std::min(space->get_height(), 700));
-            p.set_visible(false);
+            popup->set_visible(true);
+            bar.set_visible(false);
             break;
         }
         case LEFT: {
             canvas->resize(get_width() - std::min(space->get_width() + 100, 800), get_height());
-            sw.set_visible();
-            sw.resize(std::min(space->get_width(), 700), get_height() - 20);
-            p.set_visible(false);
+            popup->set_visible(true);
+            bar.set_visible(false);
             break;
         }
     }
@@ -63,14 +60,14 @@ void PopupBar::mouse_leave() {
     switch (alignment) {
         case BOTTOM: {
             canvas->resize(get_width() - 30, get_height() - 30);
-            sw.set_visible(false);
-            p.set_visible();
+            popup->set_visible(false);
+            bar.set_visible();
             break;
         }
         case LEFT: {
             canvas->resize(get_width() - 30, get_height() - 30);
-            sw.set_visible(false);
-            p.set_visible();
+            popup->set_visible(false);
+            bar.set_visible();
             break;
         }
     }
@@ -81,14 +78,12 @@ void PopupBar::toogle_bar_visibility() {
         is_popup_visible = false;
         switch (alignment) {
             case BOTTOM: {
-                p.set_content_height(0);
-                sw.set_visible(false);
+                bar.set_content_height(0);
                 canvas->resize(get_width(), get_height());
                 break;
             }
             case LEFT: {
-                p.set_content_width(0);
-                sw.set_visible(false);
+                bar.set_content_width(0);
                 canvas->resize(get_width(), get_height());
                 break;
             }
@@ -97,14 +92,12 @@ void PopupBar::toogle_bar_visibility() {
         is_popup_visible = true;
         switch (alignment) {
             case BOTTOM: {
-                p.set_content_height(30);
-                sw.set_visible(false);
+                bar.set_content_height(30);
                 canvas->resize(get_width(), get_height() - 30);
                 break;
             }
             case LEFT: {
-                p.set_content_width(30);
-                sw.set_visible(false);
+                bar.set_content_width(30);
                 canvas->resize(get_width() - 30, get_height());
                 break;
             }

@@ -131,6 +131,7 @@ void Cairomotion::handle_window_resize(const Glib::RefPtr<Gdk::FrameClock> &cloc
     if ((clock->get_frame_time() - window_size_change_timer) > 250000 &&
         allow_canvas_resize_once_per_window_resize) {
         canvas.resize(container.get_width(), container.get_height());
+        timeline.resize(get_width(), get_height());
         allow_canvas_resize_once_per_window_resize = false;
     }
     if (popup_visibility_changed) {

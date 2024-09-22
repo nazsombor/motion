@@ -17,8 +17,7 @@ public:
 private:
     Alignment alignment;
     Gtk::Box container;
-    Placeholder p;
-    ScrolledWidget sw;
+    Placeholder bar;
     Gtk::Widget *space;
     Gtk::Widget *popup;
     Canvas *canvas;
