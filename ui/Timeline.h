@@ -22,16 +22,20 @@ class MoveLayer : public Gtk::DrawingArea {
 };
 
 
-class Layer : public Gtk::Box {
+class Layer {
     public:
     std::vector<Frame*> frames;
+    Gtk::DrawingArea background;
     MoveLayer ml;
 
     Layer();
+
+    void on_draw(const Glib::RefPtr<Cairo::Context>& ctx, int width, int height);
 };
 
 class LayerHeader : public Gtk::Viewport {
 public:
+    Gtk::Box container;
     int width, height;
     LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v);
 
@@ -43,12 +47,14 @@ public:
 
 class LayerContent : public Gtk::Viewport {
 public:
+    Gtk::Box container;
     int width, height;
     LayerContent(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v);
 
     Gtk::SizeRequestMode get_request_mode_vfunc() const override;
 
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int &minimum, int &natural, int &minimum_baseline, int &natural_baseline) const override;
+
 };
 
 
@@ -66,6 +72,11 @@ public:
     Timeline();
 
     void resize(int width, int height);
+
+    void on_click();
+
+
+    void append_new_layer();
 };
 
 
