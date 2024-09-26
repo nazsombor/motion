@@ -6,6 +6,7 @@
 #define CANVAS_H
 #include <gtkmm.h>
 
+#include "Timeline.h"
 #include "../thirdparty/ink-stroke-modeler/ink_stroke_modeler/stroke_modeler.h"
 #include "../thirdparty/ink-stroke-modeler/ink_stroke_modeler/types.h"
 #include "../thirdparty/ink-stroke-modeler/ink_stroke_modeler/params.h"
@@ -23,6 +24,7 @@ class Canvas : public Gtk::DrawingArea{
 
 public:
     Drawings *drawings;
+    Timeline *timeline;
     Glib::RefPtr<Gtk::GestureStylus> *gs;
     bool stylus_up_is_not_primary_button;
 

@@ -9,13 +9,16 @@ Cairomotion::Cairomotion(): drawings(tools),
                             pb1(&pb2, &timeline, &canvas, PopupBar::BOTTOM) {
     canvas.set_valign(Gtk::Align::CENTER);
     canvas.drawings = &drawings;
+    timeline.drawings = &drawings;
+    canvas.timeline = &timeline;
     container.set_center_widget(canvas);
 
     auto style = Gtk::CssProvider::create();
     style->load_from_data(R"(
-        .center-container {
-            background-color: #ccc; }
-.selected-tool { background: #00f; color: white;})");
+        .center-container { background-color: #ccc; }
+        .selected-tool { background: #00f; color: white;}
+        .selected-layer { background-color: #ccc; }
+)");
     Gtk::StyleContext::add_provider_for_display(Gdk::Display::get_default(), style, 0);
     container.add_css_class("center-container");
     tools.pen.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -23,6 +26,7 @@ Cairomotion::Cairomotion(): drawings(tools),
     tools.solid_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.textured_brush.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
     tools.color_list.get_style_context()->add_provider(style,GTK_STYLE_PROVIDER_PRIORITY_USER);
+    timeline.content.container.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     gs = Gtk::GestureStylus::create();
     canvas.setup_gesture_stylus(gs);
@@ -100,14 +104,14 @@ void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) 
         }
         case 65363: {
             //Right arrow
-            drawings.step_forward();
             canvas.queue_draw();
+            timeline.step_forward();
             break;
         }
         case 65361: {
             //Left arrow
-            drawings.step_backward();
             canvas.queue_draw();
+            timeline.step_backward();
             break;
         }
         case 32: {
@@ -188,7 +192,6 @@ void Cairomotion::handle_pick_color_from_anywhere_the_screen() {
         );
 
         if (tools.current_color.event.xbutton.state & 256) {
-
             tools.current_color.pick_button_clicked = false;
             XImage *image1;
             image1 = XGetImage(tools.current_color.display, tools.current_color.window, 0, 0,
@@ -205,7 +208,6 @@ void Cairomotion::handle_pick_color_from_anywhere_the_screen() {
             XFree(image1);
 
             tools.color_picker.update(color.red / 256, color.green / 256, color.blue / 256);
-
         }
     }
 }

@@ -4,12 +4,22 @@
 
 #include "Timeline.h"
 
-MoveLayer::MoveLayer() {
+Frame::Frame() {
+    surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    onion_skin = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+}
+
+MoveLayer::MoveLayer() : gs(Gtk::GestureClick::create()){
     set_draw_func(sigc::mem_fun(*this, &MoveLayer::on_draw));
     set_content_width(50);
     set_content_height(60);
     set_valign(Gtk::Align::START);
     set_halign(Gtk::Align::START);
+
+    gs->signal_released().connect(sigc::mem_fun(*this, &MoveLayer::on_click));
+
+    add_controller(gs);
 }
 
 void MoveLayer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int height) {
@@ -25,11 +35,24 @@ void MoveLayer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int 
     ctx->fill();
 }
 
-Layer::Layer() {
+void MoveLayer::on_click(int count, double x, double y) {
+
+}
+
+Layer::Layer(int index, Timeline *timeline) : index(index) {
     background.set_draw_func(sigc::mem_fun(*this, &Layer::on_draw));
     background.set_content_height(60);
     background.set_content_width(3000);
     background.set_valign(Gtk::Align::START);
+    header.set_orientation(Gtk::Orientation::HORIZONTAL);
+    header.append(ml);
+    header.append(label);
+
+    gc = Gtk::GestureClick::create();
+    gc->signal_released().connect(sigc::mem_fun(*this, &Layer::on_click));
+    header.add_controller(gc);
+
+    this->timeline = timeline;
 }
 
 void Layer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int height) {
@@ -45,6 +68,21 @@ void Layer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int heig
     ctx->set_source_rgb(0, 0, 0);
     ctx->rectangle(0, 0, width, height);
     ctx->stroke();
+}
+
+void Layer::deselect() {
+    header.remove_css_class("selected-layer");
+}
+
+void Layer::select() {
+    for (auto l : timeline->layers) {
+        l->deselect();
+    }
+    header.add_css_class("selected-layer");
+}
+
+void Layer::on_click(int count, double x, double y) {
+    select();
 }
 
 LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), top_margin(20, 20, Placeholder::WHITE) {
@@ -98,6 +136,7 @@ void LayerContent::measure_vfunc(Gtk::Orientation orientation, int for_size, int
 
 void LayerContent::on_stylus_down(double x, double y) {
     std::cout << x << ' ' << y << std::endl;
+
 }
 
 void LayerContent::on_stylus_motion(double x, double y) {
@@ -108,11 +147,15 @@ void LayerContent::on_stylus_up(double x, double y) {
     std::cout << x << ' ' << y << std::endl;
 }
 
-TimelineNumbers::TimelineNumbers(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v) {
+TimelineNumbers::TimelineNumbers(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), gc(Gtk::GestureClick::create()) {
     set_child(frames);
     frames.set_content_width(3000);
     frames.set_content_height(20);
     frames.set_draw_func(sigc::mem_fun(*this, &TimelineNumbers::on_draw));
+
+    gc->signal_released().connect(sigc::mem_fun(*this, &TimelineNumbers::on_click));
+    add_controller(gc);
+
 }
 
 void TimelineNumbers::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int height) {
@@ -159,6 +202,11 @@ void TimelineNumbers::set_frame_index(int index) {
     frames.queue_draw();
 }
 
+void TimelineNumbers::on_click(int count, double x, double y) {
+    int index = ((int) x) / 40;
+    set_frame_index(index);
+}
+
 Timeline::Timeline() : layer_header_h_adjustment(Gtk::Adjustment::create(0, 0, 100)),
                        layer_content_h_adjustment(Gtk::Adjustment::create(0, 0, 100)),
                        not_in_use(Gtk::Adjustment::create(0, 0, 0)),
@@ -172,7 +220,7 @@ Timeline::Timeline() : layer_header_h_adjustment(Gtk::Adjustment::create(0, 0, 1
     button_container.append(add_layer_button);
     button_container.append(add_inbetween_button);
     add_layer_button.set_label("Add Layer");
-    add_layer_button.signal_clicked().connect(sigc::mem_fun(*this, &Timeline::on_click));
+    add_layer_button.signal_clicked().connect(sigc::mem_fun(*this, &Timeline::new_layer_button_on_click));
     add_inbetween_button.set_label("Add In-between");
     append(button_container);
 
@@ -191,6 +239,8 @@ Timeline::Timeline() : layer_header_h_adjustment(Gtk::Adjustment::create(0, 0, 1
     content_container.append(content);
     content_container.append(hs);
 
+    content.drawings = drawings;
+
     append_new_layer();
 }
 
@@ -204,14 +254,28 @@ void Timeline::resize(int width, int height) {
     timeline_numbers.width = content.width;
 }
 
-void Timeline::on_click() {
+void Timeline::new_layer_button_on_click() {
     append_new_layer();
-
 }
 
 void Timeline::append_new_layer() {
-    auto layer = new Layer();
+    auto layer = new Layer(next_layer_index++, this);
+
+    layer->select();
+
     layers.push_back(layer);
     content.container.append(layer->background);
-    header.container.append(layer->ml);
+    header.container.append(layer->header);
+}
+
+void Timeline::step_forward() {
+    frame_index++;
+    timeline_numbers.set_frame_index(frame_index);
+}
+
+void Timeline::step_backward() {
+    if (frame_index > 0) {
+        frame_index--;
+        timeline_numbers.set_frame_index(frame_index);
+    }
 }

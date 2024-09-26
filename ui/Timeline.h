@@ -10,28 +10,46 @@
 #include "../Drawings.h"
 
 
-class Frame : public Gtk::DrawingArea {
-    public:
+class Frame {
+public:
+    Glib::RefPtr<Cairo::Surface> surface, surface2, onion_skin;
+    Frame();
 };
 
 
 class MoveLayer : public Gtk::DrawingArea {
+    Glib::RefPtr<Gtk::GestureClick> gs;
+
     public:
     MoveLayer();
 
     void on_draw(const Glib::RefPtr<Cairo::Context>& ctx, int width, int height);
+
+    void on_click(int count, double x, double y);
 };
 
+class Timeline;
 
 class Layer {
     public:
-    std::vector<Frame*> frames;
+    int index = 0;
+    std::vector<Frame> frames;
     Gtk::DrawingArea background;
+    Gtk::Box header;
     MoveLayer ml;
+    Gtk::Entry label;
+    Glib::RefPtr<Gtk::GestureClick> gc;
+    Timeline *timeline;
 
-    Layer();
+    Layer(int index, Timeline *timeline);
 
     void on_draw(const Glib::RefPtr<Cairo::Context>& ctx, int width, int height);
+
+    void deselect();
+
+    void select();
+
+    void on_click(int count, double x, double y);
 };
 
 class LayerHeader : public Gtk::Viewport {
@@ -52,6 +70,9 @@ class LayerContent : public Gtk::Viewport {
 public:
     Gtk::Box container;
     int width, height;
+
+    Drawings *drawings;
+
     LayerContent(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v);
 
     Gtk::SizeRequestMode get_request_mode_vfunc() const override;
@@ -69,6 +90,7 @@ public:
 class TimelineNumbers : public Gtk::Viewport {
     Gtk::DrawingArea frames;
     int frame_index = 0;
+    Glib::RefPtr<Gtk::GestureClick> gc;
 public:
 
     int width;
@@ -83,11 +105,14 @@ public:
 
     void set_frame_index(int index);
 
+    void on_click(int count, double x, double y);
+
 };
 
 
 
 class Timeline : public Gtk::Box {
+public:
     // UI
     Gtk::Box button_container, layer_container, content_container;
     Gtk::Button add_layer_button, add_inbetween_button;
@@ -102,16 +127,24 @@ class Timeline : public Gtk::Box {
     int layer_index = 0;
     int end_frame_index = 0;
     int end_layer_index = 0;
+    int next_layer_index = 0;
 
-public:
+
+    Drawings *drawings;
     std::vector<Layer*> layers;
     Timeline();
 
     void resize(int width, int height);
 
-    void on_click();
+    void new_layer_button_on_click();
 
     void append_new_layer();
+
+    void step_forward();
+
+    void step_backward();
+
+    void select_layer();
 };
 
 

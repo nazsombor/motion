@@ -9,12 +9,6 @@
 #include "thirdparty/ink-stroke-modeler/ink_stroke_modeler/types.h"
 #include "ui/Tools.h"
 
-class Frame2 {
-    public:
-    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin;
-    Frame2();
-};
-
 
 class Drawings {
     int stroke_index;
@@ -22,7 +16,7 @@ class Drawings {
     int index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, int stride, int j, int x, int y);
 
 public:
-    std::vector<Frame2> frames;
+    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin, previous_surface, next_surface;
     int frameIndex = 0;
     gint64 frame_duration = 1000000 / 12;
     gint64 previous_frame_time = 0;
@@ -39,7 +33,7 @@ public:
 
     void solid_brush(std::vector<ink::stroke_model::Result> &stroke);
 
-    void clear_pencil_data();
+    void clear_stroke_data();
 
     void step_forward();
 
@@ -53,6 +47,6 @@ public:
 
     unsigned char *pixel2(int x, int y);
 
-    void onion_skin();
+    void calculate_onion_skin();
 };
 #endif //DRAWINGS_H
