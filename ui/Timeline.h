@@ -12,8 +12,9 @@
 
 class Frame {
 public:
-    Glib::RefPtr<Cairo::Surface> surface, surface2, onion_skin;
-    Frame();
+    int index, duration = 1;
+    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin;
+    Frame(int index);
 };
 
 
@@ -33,7 +34,7 @@ class Timeline;
 class Layer {
     public:
     int index = 0;
-    std::vector<Frame> frames;
+    std::vector<Frame*> frames;
     Gtk::DrawingArea background;
     Gtk::Box header;
     MoveLayer ml;
@@ -50,6 +51,10 @@ class Layer {
     void select();
 
     void on_click(int count, double x, double y);
+
+    Frame *get_frame(int frame_index);
+
+    Frame *get_previous_frame(Frame *frame);
 };
 
 class LayerHeader : public Gtk::Viewport {
@@ -93,6 +98,7 @@ class TimelineNumbers : public Gtk::Viewport {
     Glib::RefPtr<Gtk::GestureClick> gc;
 public:
 
+    Timeline *timeline;
     int width;
 
     TimelineNumbers(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v);
@@ -132,6 +138,8 @@ public:
 
     Drawings *drawings;
     std::vector<Layer*> layers;
+    bool request_canvas_redraw = false;
+
     Timeline();
 
     void resize(int width, int height);
@@ -145,6 +153,10 @@ public:
     void step_backward();
 
     void select_layer();
+
+    void check_if_frame_exists();
+
+    void set_frame_index(int index);
 };
 
 

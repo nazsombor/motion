@@ -4,7 +4,7 @@
 
 #include "Timeline.h"
 
-Frame::Frame() {
+Frame::Frame(int index) : index(index){
     surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     onion_skin = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
@@ -65,6 +65,15 @@ void Layer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int heig
         ctx->rectangle(i, 0, 40, 60);
         ctx->fill();
     }
+
+    for (auto frame : frames) {
+        ctx->set_source_rgb(0.9, 0.9, 0.9);
+        ctx->rectangle(frame->index * 40, 0, frame->duration * 40, 60);
+        ctx->fill_preserve();
+        ctx->set_source_rgb(0, 0, 0);
+        ctx->stroke();
+    }
+
     ctx->set_source_rgb(0, 0, 0);
     ctx->rectangle(0, 0, width, height);
     ctx->stroke();
@@ -79,10 +88,31 @@ void Layer::select() {
         l->deselect();
     }
     header.add_css_class("selected-layer");
+    timeline->layer_index = index;
 }
 
 void Layer::on_click(int count, double x, double y) {
     select();
+}
+
+Frame *Layer::get_frame(int frame_index) {
+    for(auto frame : frames) {
+        if (frame->index == frame_index || (frame->index + frame->duration > frame_index && frame->index < frame_index)) {
+            return frame;
+        }
+    }
+    return nullptr;
+}
+
+Frame * Layer::get_previous_frame(Frame *frame) {
+    Frame *previous_frame = nullptr;
+    for (auto f : frames) {
+        if (f == frame) {
+            return previous_frame;
+        }
+        previous_frame = f;
+    }
+    return nullptr;
 }
 
 LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), top_margin(20, 20, Placeholder::WHITE) {
@@ -199,6 +229,7 @@ void TimelineNumbers::measure_vfunc(Gtk::Orientation orientation, int for_size, 
 
 void TimelineNumbers::set_frame_index(int index) {
     frame_index = index;
+    timeline->set_frame_index(index);
     frames.queue_draw();
 }
 
@@ -240,6 +271,7 @@ Timeline::Timeline() : layer_header_h_adjustment(Gtk::Adjustment::create(0, 0, 1
     content_container.append(hs);
 
     content.drawings = drawings;
+    timeline_numbers.timeline = this;
 
     append_new_layer();
 }
@@ -260,7 +292,6 @@ void Timeline::new_layer_button_on_click() {
 
 void Timeline::append_new_layer() {
     auto layer = new Layer(next_layer_index++, this);
-
     layer->select();
 
     layers.push_back(layer);
@@ -278,4 +309,38 @@ void Timeline::step_backward() {
         frame_index--;
         timeline_numbers.set_frame_index(frame_index);
     }
+}
+
+void Timeline::check_if_frame_exists() {
+    auto frame = layers[layer_index]->get_frame(frame_index);
+
+    if (!frame) {
+        frame = new Frame(frame_index);
+        layers[layer_index]->frames.push_back(frame);
+        auto previous_frame = layers[layer_index]->get_previous_frame(frame);
+        if (previous_frame) {
+            previous_frame->duration = frame_index - previous_frame->index;
+        }
+    }
+
+    drawings->surface = frame->surface;
+    drawings->surface2 = frame->surface2;
+    drawings->onion_skin = frame->onion_skin;
+    layers[layer_index]->background.queue_draw();
+
+}
+
+void Timeline::set_frame_index(int index) {
+    frame_index = index;
+    request_canvas_redraw = true;
+    auto frame = layers[layer_index]->get_frame(frame_index);
+
+    if (frame) {
+        drawings->surface = frame->surface;
+        drawings->surface2 = frame->surface2;
+        drawings->onion_skin = frame->onion_skin;
+    } else {
+        drawings->surface = nullptr;
+    }
+
 }

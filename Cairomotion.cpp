@@ -217,5 +217,11 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     handle_play(clock);
     handle_update_color_picker();
     handle_pick_color_from_anywhere_the_screen();
+
+    if (timeline.request_canvas_redraw) {
+        timeline.request_canvas_redraw = false;
+        canvas.queue_draw();
+    }
+
     return true;
 }

@@ -70,6 +70,8 @@ void Canvas::on_stylus_down(double x, double y) {
 
     drawings->clear_stroke_data();
 
+    timeline->check_if_frame_exists();
+
     switch (drawings->tools->type) {
         case Tools::PEN:
             drawings->pen(smoothed_stroke);
