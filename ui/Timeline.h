@@ -55,6 +55,12 @@ class Layer {
     Frame *get_frame(int frame_index);
 
     Frame *get_previous_frame(Frame *frame);
+
+    Frame *get_previous_frame(int frame_index);
+
+    Frame *get_next_frame(Frame *frame);
+
+    Frame *get_next_frame(int frame_index);
 };
 
 class LayerHeader : public Gtk::Viewport {

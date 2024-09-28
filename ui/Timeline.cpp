@@ -115,6 +115,44 @@ Frame * Layer::get_previous_frame(Frame *frame) {
     return nullptr;
 }
 
+Frame *Layer::get_previous_frame(int frame_index) {
+    Frame *previous_frame = nullptr;
+
+    for (auto frame : frames) {
+        if (frame->index + frame->duration - 1 < frame_index) {
+            previous_frame = frame;
+        }
+    }
+
+    return previous_frame;
+}
+
+Frame * Layer::get_next_frame(Frame *frame) {
+    Frame *next_frame = nullptr;
+    for (int i = frames.size() - 1; i >= 0; i--) {
+        if (frames[i] == frame) {
+            return next_frame;
+        }
+        next_frame = frames[i];
+    }
+    return nullptr;
+}
+
+Frame * Layer::get_next_frame(int frame_index) {
+
+    Frame *next_frame = nullptr;
+
+    if (frames.size() == 0) return nullptr;
+
+    for (int i = frames.size() - 1; i >= 0; i--) {
+        if (frames[i]->index > frame_index) {
+            next_frame = frames[i];
+        }
+    }
+
+    return next_frame;
+}
+
 LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), top_margin(20, 20, Placeholder::WHITE) {
     set_child(container);
     container.set_orientation(Gtk::Orientation::VERTICAL);
@@ -369,6 +407,16 @@ void Timeline::check_if_frame_exists() {
     drawings->surface2 = frame->surface2;
     drawings->onion_skin = frame->onion_skin;
 
+    // auto previous_frame = layers[layer_index]->get_previous_frame(frame_index);
+    // if (previous_frame) {
+    //     drawings->previous_surface = previous_frame->surface;
+    // }
+    // auto next_frame = layers[layer_index]->get_next_frame(frame_index);
+    // if (next_frame) {
+    //     drawings->next_surface = next_frame->surface;
+    // }
+    drawings->calculate_onion_skin();
+
     layers[layer_index]->background.queue_draw();
 
 }
@@ -387,5 +435,20 @@ void Timeline::set_frame_index(int index) {
     }
 
     draw_top_and_bottom();
+
+    auto previous_frame = layers[layer_index]->get_previous_frame(frame_index);
+    if (previous_frame) {
+        drawings->previous_surface = previous_frame->surface;
+    } else {
+        drawings->previous_surface = nullptr;
+    }
+
+    auto next_frame = layers[layer_index]->get_next_frame(frame_index);
+    if (next_frame) {
+        drawings->next_surface = next_frame->surface;
+    } else {
+        drawings->next_surface = nullptr;
+    }
+    drawings->calculate_onion_skin();
 
 }
