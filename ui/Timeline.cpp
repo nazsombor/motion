@@ -319,9 +319,10 @@ void Timeline::resize(int width, int height) {
     header.height = 500;
     content.width = width - 300 - vs.get_width();
     content.height = 500 - hs.get_height();
+    timeline_numbers.width = content.width;
     header.queue_resize();
     content.queue_resize();
-    timeline_numbers.width = content.width;
+    timeline_numbers.queue_resize();
 }
 
 void Timeline::new_layer_button_on_click() {
