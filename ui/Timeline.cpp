@@ -311,6 +311,43 @@ void Timeline::step_backward() {
     }
 }
 
+void Timeline::draw_top_and_bottom() {
+    auto frame = layers[layer_index]->get_frame(frame_index);
+    auto top = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    auto top_ctx = Cairo::Context::create(top);
+    auto bottom = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    auto bottom_ctx = Cairo::Context::create(bottom);
+
+    bool is_bottom = true;
+    for (int i = layers.size() - 1; i >= 0; i--) {
+        auto f = layers[i]->get_frame(frame_index);
+
+        if (!f) continue;
+
+        if (i == layer_index) {
+            is_bottom = false;
+            continue;
+        }
+
+        if (is_bottom) {
+            bottom_ctx->set_source(f->surface2, 0, 0);
+            bottom_ctx->paint();
+            bottom_ctx->set_source(f->surface, 0, 0);
+            bottom_ctx->paint();
+        } else {
+            top_ctx->set_source(f->surface2, 0, 0);
+            top_ctx->paint();
+            top_ctx->set_source(f->surface, 0, 0);
+            top_ctx->paint();
+        }
+    }
+
+    drawings->top = top;
+    drawings->bottom = bottom;
+
+    request_canvas_redraw = true;
+}
+
 void Timeline::check_if_frame_exists() {
     auto frame = layers[layer_index]->get_frame(frame_index);
 
@@ -323,9 +360,15 @@ void Timeline::check_if_frame_exists() {
         }
     }
 
+    Cairo::RefPtr<Cairo::ImageSurface> top;
+    Cairo::RefPtr<Cairo::ImageSurface> bottom;
+
+    draw_top_and_bottom();
+
     drawings->surface = frame->surface;
     drawings->surface2 = frame->surface2;
     drawings->onion_skin = frame->onion_skin;
+
     layers[layer_index]->background.queue_draw();
 
 }
@@ -342,5 +385,7 @@ void Timeline::set_frame_index(int index) {
     } else {
         drawings->surface = nullptr;
     }
+
+    draw_top_and_bottom();
 
 }

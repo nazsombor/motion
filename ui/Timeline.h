@@ -152,6 +152,8 @@ public:
 
     void step_backward();
 
+    void draw_top_and_bottom();
+
     void select_layer();
 
     void check_if_frame_exists();

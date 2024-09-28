@@ -16,7 +16,7 @@ class Drawings {
     int index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, int stride, int j, int x, int y);
 
 public:
-    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin, previous_surface, next_surface;
+    Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin, previous_surface, next_surface, top, bottom;
     int frameIndex = 0;
     gint64 frame_duration = 1000000 / 12;
     gint64 previous_frame_time = 0;
