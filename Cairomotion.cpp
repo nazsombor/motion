@@ -155,7 +155,8 @@ void Cairomotion::handle_play(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         drawings.stop_playing = true;
         if (clock->get_frame_time() - drawings.previous_frame_time > drawings.frame_duration) {
             drawings.previous_frame_time = clock->get_frame_time();
-            drawings.play_next();
+            timeline.play_next();
+            timeline.timeline_numbers.queue_draw();
             canvas.queue_draw();
         }
     } else if (drawings.stop_playing) {

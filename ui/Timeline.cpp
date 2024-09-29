@@ -153,6 +153,11 @@ Frame * Layer::get_next_frame(int frame_index) {
     return next_frame;
 }
 
+int Layer::get_last_frame_index() {
+    auto frame = frames[frames.size() - 1];
+    return frame->index + frame->duration - 1;
+}
+
 LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), top_margin(20, 20, Placeholder::WHITE) {
     set_child(container);
     container.set_orientation(Gtk::Orientation::VERTICAL);
@@ -267,13 +272,13 @@ void TimelineNumbers::measure_vfunc(Gtk::Orientation orientation, int for_size, 
 
 void TimelineNumbers::set_frame_index(int index) {
     frame_index = index;
-    timeline->set_frame_index(index);
     frames.queue_draw();
 }
 
 void TimelineNumbers::on_click(int count, double x, double y) {
     int index = ((int) x) / 40;
     set_frame_index(index);
+    timeline->set_frame_index(frame_index);
 }
 
 Timeline::Timeline() : layer_header_h_adjustment(Gtk::Adjustment::create(0, 0, 100)),
@@ -340,13 +345,13 @@ void Timeline::append_new_layer() {
 
 void Timeline::step_forward() {
     frame_index++;
-    timeline_numbers.set_frame_index(frame_index);
+    set_frame_index(frame_index);
 }
 
 void Timeline::step_backward() {
     if (frame_index > 0) {
         frame_index--;
-        timeline_numbers.set_frame_index(frame_index);
+        set_frame_index(frame_index);
     }
 }
 
@@ -423,6 +428,7 @@ void Timeline::check_if_frame_exists() {
 }
 
 void Timeline::set_frame_index(int index) {
+    timeline_numbers.set_frame_index(index);
     frame_index = index;
     request_canvas_redraw = true;
     auto frame = layers[layer_index]->get_frame(frame_index);
@@ -452,4 +458,21 @@ void Timeline::set_frame_index(int index) {
     }
     drawings->calculate_onion_skin();
 
+}
+
+void Timeline::play_next() {
+
+    int last_frame_index = 0;
+    for (auto layer : layers) {
+        int lfi = layer->get_last_frame_index();
+        if (lfi > last_frame_index) {
+            last_frame_index = lfi;
+        }
+    }
+
+    if (last_frame_index > frame_index) {
+        set_frame_index(frame_index + 1);
+    } else {
+        set_frame_index(0);
+    }
 }

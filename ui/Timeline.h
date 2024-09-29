@@ -61,6 +61,8 @@ class Layer {
     Frame *get_next_frame(Frame *frame);
 
     Frame *get_next_frame(int frame_index);
+
+    int get_last_frame_index();
 };
 
 class LayerHeader : public Gtk::Viewport {
@@ -165,6 +167,8 @@ public:
     void check_if_frame_exists();
 
     void set_frame_index(int index);
+
+    void play_next();
 };
 
 
