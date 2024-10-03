@@ -35,7 +35,6 @@ void ColorListItem::on_click(int count, double x, double y) {
     list->g = g / 256.0;
     list->b = b / 256.0;
     list->update_color_picker = true;
-    std::cout << "it should send the color" << std::endl;
 }
 
 ColorList::ColorList() {

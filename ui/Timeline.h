@@ -154,7 +154,7 @@ public:
 
     void new_layer_button_on_click();
 
-    void append_new_layer();
+    Layer *append_new_layer();
 
     void step_forward();
 
@@ -169,6 +169,8 @@ public:
     void set_frame_index(int index);
 
     void play_next();
+
+    void clear_layers();
 };
 
 

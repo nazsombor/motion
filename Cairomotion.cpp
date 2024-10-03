@@ -213,6 +213,8 @@ void Cairomotion::handle_pick_color_from_anywhere_the_screen() {
     }
 }
 
+
+
 bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     handle_window_resize(clock);
     handle_play(clock);
@@ -222,6 +224,61 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     if (timeline.request_canvas_redraw) {
         timeline.request_canvas_redraw = false;
         canvas.queue_draw();
+    }
+
+    if (tools.file_operation.start_saving) {
+        tools.file_operation.start_saving = false;
+
+        std::vector<LayerEntity> layers;
+
+        for (auto layer : timeline.layers) {
+            LayerEntity layer_entity(layer->index);
+
+            for (auto frame : layer->frames) {
+                layer_entity.frames.emplace_back(frame->index, frame->duration, frame->surface, frame->surface2);
+            }
+            layers.push_back(layer_entity);
+        }
+
+        std::vector<ColorEntity> colors;
+
+        for (auto item : tools.color_list.items) {
+            ColorEntity color(item->r, item->g, item->b, item->text.get_text());
+            colors.push_back(color);
+        }
+
+        tools.file_operation.save(layers, colors);
+    }
+
+    if (tools.file_operation.start_opening) {
+        tools.file_operation.start_opening = false;
+
+        timeline.clear_layers();
+
+        std::vector<LayerEntity> layers;
+        std::vector<ColorEntity> colors;
+
+        tools.file_operation.open(layers, colors);
+
+        for (auto layer : layers) {
+            auto l = timeline.append_new_layer();
+            for (auto frame : layer.frames) {
+                auto f = new Frame(frame.index);
+                f->duration = frame.duration;
+                f->surface = frame.surface;
+                f->surface2 = frame.surface2;
+                f->onion_skin = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+                l->frames.push_back(f);
+            }
+            l->background.queue_draw();
+        }
+
+        timeline.set_frame_index(0);
+
+        for (auto color : colors) {
+            tools.color_list.add_color(color.r, color.g, color.b, color.name);
+        }
+
     }
 
     return true;

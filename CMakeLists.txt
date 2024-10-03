@@ -35,6 +35,8 @@ add_executable(cairomotion main.cpp
         ui/CurrentColor.h
         ui/Timeline.cpp
         ui/Timeline.h
+        ui/FileOperation.cpp
+        ui/FileOperation.h
 )
 
 target_link_libraries(cairomotion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params X11)

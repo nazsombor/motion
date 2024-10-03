@@ -96,6 +96,7 @@ void Layer::on_click(int count, double x, double y) {
 }
 
 Frame *Layer::get_frame(int frame_index) {
+    auto f = frames.size();
     for(auto frame : frames) {
         if (frame->index == frame_index || (frame->index + frame->duration > frame_index && frame->index < frame_index)) {
             return frame;
@@ -334,13 +335,15 @@ void Timeline::new_layer_button_on_click() {
     append_new_layer();
 }
 
-void Timeline::append_new_layer() {
+Layer *Timeline::append_new_layer() {
     auto layer = new Layer(next_layer_index++, this);
     layer->select();
 
     layers.push_back(layer);
     content.container.append(layer->background);
     header.container.append(layer->header);
+
+    return layer;
 }
 
 void Timeline::step_forward() {
@@ -413,14 +416,6 @@ void Timeline::check_if_frame_exists() {
     drawings->surface2 = frame->surface2;
     drawings->onion_skin = frame->onion_skin;
 
-    // auto previous_frame = layers[layer_index]->get_previous_frame(frame_index);
-    // if (previous_frame) {
-    //     drawings->previous_surface = previous_frame->surface;
-    // }
-    // auto next_frame = layers[layer_index]->get_next_frame(frame_index);
-    // if (next_frame) {
-    //     drawings->next_surface = next_frame->surface;
-    // }
     drawings->calculate_onion_skin();
 
     layers[layer_index]->background.queue_draw();
@@ -475,4 +470,18 @@ void Timeline::play_next() {
     } else {
         set_frame_index(0);
     }
+}
+
+void Timeline::clear_layers() {
+
+    for (auto layer : layers) {
+        content.container.remove(layer->background);
+        header.container.remove(layer->header);
+    }
+
+    layer_index = 0;
+    next_layer_index = 0;
+
+    layers.clear();
+
 }

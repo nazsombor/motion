@@ -43,7 +43,9 @@ Tools::Tools() : current_color(&color_list), color_picker(&current_color){
             select_textured_brush();
             break;
     }
-    select_pen();
+
+    append(file_operation);
+
 }
 
 void Tools::select_pen() {

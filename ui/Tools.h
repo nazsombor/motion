@@ -9,6 +9,7 @@
 #include "ColorList.h"
 #include "ColorPicker.h"
 #include "CurrentColor.h"
+#include "FileOperation.h"
 
 
 class Tools : public Gtk::Box {
@@ -24,6 +25,7 @@ public:
     CurrentColor current_color;
     ColorPicker color_picker;
     bool solid_brush_selected;
+    FileOperation file_operation;
 
     Tools();
 

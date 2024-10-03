@@ -348,6 +348,9 @@ unsigned char *Drawings::pixel2(int x, int y) {
 }
 
 void Drawings::calculate_onion_skin() {
+
+    if (!onion_skin) return;
+
     onion_skin->flush();
 
     for (int i = 0; i < onion_skin->get_stride() * onion_skin->get_height(); i += 4) {

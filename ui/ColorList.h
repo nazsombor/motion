@@ -30,9 +30,9 @@ class ColorListItem : public Gtk::Box {
 
 class ColorList : public ScrolledWidget{
     Gtk::Box list;
-    std::vector<ColorListItem*> items;
 
 public:
+    std::vector<ColorListItem*> items;
     double r, g, b;
     bool update_color_picker = false;
 
