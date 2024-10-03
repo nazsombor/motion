@@ -222,11 +222,6 @@ void Drawings::fill_area(int x, int y) {
     };
     std::memcpy(check_color, pixel2(x, y), sizeof(check_color));
 
-    std::cout << "check_color: " << (int) check_color[0] << " " << (int) check_color[1] << " " << (int) check_color[2]
-            << " " << (int) check_color[3] << " " << std::endl;
-    std::cout << "fill_color: " << (int) fill_color[0] << " " << (int) fill_color[1] << " " << (int) fill_color[2] <<
-            " " << (int) fill_color[3] << " " << std::endl;
-
     std::vector<FillArea> points;
     points.emplace_back(x, y, 0);
 
@@ -251,7 +246,7 @@ void Drawings::fill_area(int x, int y) {
             }
 
             bool up = points[i].y - 1 >= 0, down = points[i].y + 1 < 1080, left = points[i].x - 1 > 0, right =
-                    points[i].x <= 1920;
+                    points[i].x + 1 < 1920;
 
 
             auto a = pixel2(points[i].x + 1, points[i].y);
