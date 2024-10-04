@@ -38,8 +38,8 @@ FileOperation::FileOperation() : open_file_dialog(
     append(save_as_button);
     append(export_button);
 
-    open_file_button.set_label("Open File");
-    save_file_button.set_label("Save File");
+    open_file_button.set_label("Open");
+    save_file_button.set_label("Save");
     save_as_button.set_label("Save As");
     export_button.set_label("Export");
 
@@ -66,6 +66,11 @@ void FileOperation::on_open_file_response(int response) {
 }
 
 void FileOperation::on_save_file() {
+    if (file_is_open) {
+        start_saving = true;
+    } else {
+        save_as_dialog->show();
+    }
 }
 
 void FileOperation::on_save_as() {
@@ -81,9 +86,14 @@ void FileOperation::on_save_as_response(int response) {
 }
 
 void FileOperation::on_export() {
+    export_dialog->show();
 }
 
 void FileOperation::on_export_response(int response) {
+    if (response == Gtk::ResponseType::ACCEPT) {
+        export_path = export_dialog->get_file()->get_path();
+        start_export = true;
+    }
 }
 
 void FileOperation::save(const std::vector<LayerEntity> &layers, const std::vector<ColorEntity> &colors) {

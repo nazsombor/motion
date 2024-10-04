@@ -59,6 +59,10 @@ protected:
 
     void handle_pick_color_from_anywhere_the_screen();
 
+    void handle_save();
+
+    void handle_open();
+
     bool tick(const Glib::RefPtr<Gdk::FrameClock> &clock);
 };
 

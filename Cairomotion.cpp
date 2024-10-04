@@ -214,18 +214,7 @@ void Cairomotion::handle_pick_color_from_anywhere_the_screen() {
 }
 
 
-
-bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
-    handle_window_resize(clock);
-    handle_play(clock);
-    handle_update_color_picker();
-    handle_pick_color_from_anywhere_the_screen();
-
-    if (timeline.request_canvas_redraw) {
-        timeline.request_canvas_redraw = false;
-        canvas.queue_draw();
-    }
-
+void Cairomotion::handle_save() {
     if (tools.file_operation.start_saving) {
         tools.file_operation.start_saving = false;
 
@@ -249,7 +238,9 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
 
         tools.file_operation.save(layers, colors);
     }
+}
 
+void Cairomotion::handle_open() {
     if (tools.file_operation.start_opening) {
         tools.file_operation.start_opening = false;
 
@@ -278,8 +269,30 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
         for (auto color : colors) {
             tools.color_list.add_color(color.r, color.g, color.b, color.name);
         }
+    }
+}
+
+bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+    handle_window_resize(clock);
+    handle_play(clock);
+    handle_update_color_picker();
+    handle_pick_color_from_anywhere_the_screen();
+
+    if (timeline.request_canvas_redraw) {
+        timeline.request_canvas_redraw = false;
+        canvas.queue_draw();
+    }
+
+    handle_save();
+    handle_open();
+
+    if (tools.file_operation.start_export) {
+        tools.file_operation.start_export = false;
+
+        timeline.export_to(tools.file_operation.export_path);
 
     }
+
 
     return true;
 }

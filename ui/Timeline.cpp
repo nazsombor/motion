@@ -485,3 +485,38 @@ void Timeline::clear_layers() {
     layers.clear();
 
 }
+
+void Timeline::export_to(const std::string &path) {
+    int last_frame_index = 0;
+    for (auto layer : layers) {
+        auto l = layer->get_last_frame_index();
+        if (l > last_frame_index) {
+            last_frame_index = l;
+        }
+    }
+    int index = 0;
+    while (index <= last_frame_index) {
+        auto frame = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+        auto cr = Cairo::Context::create(frame);
+
+        for (int i = layers.size() - 1; i >= 0; i--) {
+            auto f = layers[i]->get_frame(index);
+            if (f) {
+                cr->set_source(f->surface2, 0, 0);
+                cr->paint();
+                cr->set_source(f->surface, 0, 0);
+                cr->paint();
+            }
+        }
+
+        std::string name = std::to_string(index);
+
+        for (int i = 4 - name.size(); i >= 0; i--) {
+            name.insert(0, "0");
+        }
+
+        frame->write_to_png(path + "_" + name + ".png");
+
+        index++;
+    }
+}

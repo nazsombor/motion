@@ -171,6 +171,8 @@ public:
     void play_next();
 
     void clear_layers();
+
+    void export_to(const std::string & string);
 };
 
 

@@ -42,6 +42,8 @@ public:
     std::string path;
     bool start_saving = false;
     bool start_opening = false;
+    bool start_export = false;
+    std::string export_path;
 
     FileOperation();
 
