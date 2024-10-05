@@ -69,15 +69,15 @@ void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int
     auto h = (double) height / 1080;
 
     cr->scale(w, h);
+    if (bottom) {
+        cr->set_source(bottom, 0, 0);
+        cr->paint();
+    }
     if (!play) {
         if (onion_skin) {
             cr->set_source(onion_skin, 0, 0);
             cr->paint();
         }
-    }
-    if (bottom) {
-        cr->set_source(bottom, 0, 0);
-        cr->paint();
     }
     if (surface) {
         cr->set_source(surface2, 0, 0);
