@@ -38,3 +38,9 @@ Export the image sequence with the Export button to a folder.
 Frames are added to the current time of the selected layer. If you move the time indicator further and start drawing, an new frame will be added and the previous frame is extended until the current frame.
 
 Moving the frames is not yet implemented.
+
+### Canvas
+
+The size of the canvas is currently only 1920 x 1080 pixels. When you draw a line, it is the most smooth when the canvas has it's full size (fullscreened and no bars).
+
+When you use the solid brush, it draws a thick line. If you press the middle button, it fills the area. So if you have a pen line that is not closed, you can close it with the solid brush and then fill the color.
