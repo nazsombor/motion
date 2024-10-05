@@ -7,6 +7,7 @@
 
 #include <gtkmm.h>
 #include <fstream>
+#include <cairomm/cairomm.h>
 
 class FrameEntity {
     public:
@@ -31,6 +32,17 @@ class ColorEntity {
     std::string name;
     ColorEntity();
     ColorEntity(int r, int g, int b, std::string name);
+};
+
+class PNGStream {
+public:
+    std::fstream *file;
+
+    PNGStream(std::fstream *file);
+
+    Cairo::ErrorStatus write(const unsigned char *data, unsigned int length);
+
+    Cairo::ErrorStatus read(unsigned char *data, unsigned int length);
 };
 
 
