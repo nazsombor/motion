@@ -4,6 +4,10 @@
 
 #include "CurrentColor.h"
 
+void test() {
+    std::cout << "test"<< std::endl;
+}
+
 CurrentColor::CurrentColor(ColorList *list) {
     this->list = list;
 
@@ -34,6 +38,7 @@ CurrentColor::CurrentColor(ColorList *list) {
 
     XSelectInput(display, window, ButtonPressMask | ButtonReleaseMask);
     XFlush(display);
+
 }
 
 void CurrentColor::update_color(int r, int g, int b) {

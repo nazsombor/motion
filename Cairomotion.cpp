@@ -89,6 +89,11 @@ void Cairomotion::size_allocate_vfunc(int width, int height, int baseline) {
 
 void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) {
     std::cout << key << std::endl;
+
+    if (util_widget_is_focused(tools.current_color.text)) {
+        return;
+    }
+
     switch (key) {
         case 65480: {
             // F11
