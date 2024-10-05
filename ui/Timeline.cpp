@@ -277,7 +277,9 @@ void TimelineNumbers::set_frame_index(int index) {
 }
 
 void TimelineNumbers::on_click(int count, double x, double y) {
-    int index = ((int) x) / 40;
+    auto ratio = timeline->layer_content_h_adjustment->get_upper() / frames.get_content_width();
+    int x_offset = timeline->layer_content_h_adjustment->get_value() * ratio;
+    int index = ((int) x + x_offset) / 40;
     set_frame_index(index);
     timeline->set_frame_index(frame_index);
 }
