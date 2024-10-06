@@ -61,7 +61,6 @@ int Drawings::index(ink::stroke_model::Result &a, ink::stroke_model::Result &b, 
 
 Drawings::Drawings(Tools &tools) {
     this->tools = &tools;
-
 }
 
 void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int height) {

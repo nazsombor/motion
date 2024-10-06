@@ -277,27 +277,43 @@ void Cairomotion::handle_open() {
     }
 }
 
-bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
-    handle_window_resize(clock);
-    handle_play(clock);
-    handle_update_color_picker();
-    handle_pick_color_from_anywhere_the_screen();
-
-    if (timeline.request_canvas_redraw) {
-        timeline.request_canvas_redraw = false;
-        canvas.queue_draw();
-    }
-
-    handle_save();
-    handle_open();
-
+void Cairomotion::handle_export() {
     if (tools.file_operation.start_export) {
         tools.file_operation.start_export = false;
 
         timeline.export_to(tools.file_operation.export_path);
 
     }
+}
 
+void Cairomotion::handle_canvas_redraw_on_timeline_change() {
+    if (timeline.request_canvas_redraw) {
+        timeline.request_canvas_redraw = false;
+        canvas.queue_draw();
+    }
+}
+
+bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+    handle_window_resize(clock);
+    handle_play(clock);
+    handle_update_color_picker();
+    handle_pick_color_from_anywhere_the_screen();
+    handle_canvas_redraw_on_timeline_change();
+    handle_save();
+    handle_open();
+    handle_export();
 
     return true;
+}
+
+bool Cairomotion::util_widget_is_focused(Gtk::Widget &widget) {
+    const Gtk::Root *root = widget.get_root ();
+    if (!root)
+        return false;
+
+    const Gtk::Widget *focused = root->get_focus ();
+    if (!focused)
+        return false;
+
+    return focused->is_ancestor (widget);
 }

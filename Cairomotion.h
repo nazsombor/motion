@@ -15,19 +15,6 @@
 #include "ui/CanvasContainer.h"
 #include "ui/Timeline.h"
 
-inline bool util_widget_is_focused (Gtk::Widget& widget)
-{
-    const Gtk::Root *root = widget.get_root ();
-    if (!root)
-        return false;
-
-    const Gtk::Widget *focused = root->get_focus ();
-    if (!focused)
-        return false;
-
-    return focused->is_ancestor (widget);
-}
-
 class Cairomotion : public Gtk::Window {
     Canvas canvas;
     Tools tools;
@@ -76,7 +63,13 @@ protected:
 
     void handle_open();
 
+    void handle_export();
+
+    void handle_canvas_redraw_on_timeline_change();
+
     bool tick(const Glib::RefPtr<Gdk::FrameClock> &clock);
+
+    bool util_widget_is_focused (Gtk::Widget& widget);
 };
 
 #define Status int

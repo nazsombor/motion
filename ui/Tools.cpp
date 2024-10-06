@@ -28,7 +28,6 @@ Tools::Tools() : current_color(&color_list), color_picker(&current_color){
     solid_brush.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_solid_brush));
     textured_brush.signal_clicked().connect(sigc::mem_fun(*this, &Tools::select_textured_brush));
 
-
     switch(type) {
         case PEN:
             select_pen();
