@@ -1,4 +1,4 @@
-# Cairomotion
+# Motion
 
 An animation creator software made with GTK4.
 
@@ -6,7 +6,7 @@ An animation creator software made with GTK4.
 
 ## Documentation
 
-When you open cairomotion, you can see a canvas and a blue bar on the left side and bottom side.
+When you open Motion, you can see a canvas and a blue bar on the left side and bottom side.
 
 If you hover over your cursor on the left side bar, the tools pop up. Hovering over the bottom side bar, the timeline pops up.
 
@@ -27,7 +27,9 @@ can be adjusted with the scrollbar.
 
 You can save the colors in a list with a name with the Add button and update it with the Update button.
 
-You can also pick a color from anywhere the screen with the Pick button.
+You can also pick a color from anywhere the monitor with the Pick button.
+
+Save, open projects. The file extension of the Motion project file can be ".mpf".
 
 Export the image sequence with the Export button to a folder.
 
@@ -35,7 +37,7 @@ Export the image sequence with the Export button to a folder.
 
 ![Timeline](timeline.png)
 
-Frames are added to the current time of the selected layer. If you move the time indicator further and start drawing, an new frame will be added and the previous frame is extended until the current frame.
+Frames are added to the current time in the selected layer. If you move the time indicator further and start drawing, a new frame will be added and the previous frame is extended until the current frame.
 
 Moving the frames is not yet implemented.
 
