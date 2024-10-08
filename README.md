@@ -46,3 +46,12 @@ Moving the frames is not yet implemented.
 The size of the canvas is currently only 1920 x 1080 pixels. When you draw a line, it is the most smooth when the canvas has it's full size (fullscreened and no bars).
 
 When you use the solid brush, it draws a thick line. If you press the middle button, it fills the area. So if you have a pen line that is not closed, you can close it with the solid brush and then fill the color.
+
+
+### Known Issues
+
+- The textured brush is not implemented yet.
+- Picking color from an image is not picking color correctly, but a slightly differenct one.
+- Glitching when opening the timeline. On the second time it is presented correctly.
+- Solid brush's color filling feature doesn't respect pencil lines, only pen lines.
+- Add In-Between button is not yet implemented.
