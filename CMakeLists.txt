@@ -10,7 +10,7 @@ pkg_check_modules(GTKMM REQUIRED gtkmm-4.0)
 include_directories(${GTKMM_INCLUDE_DIRS})
 link_directories(${GTKMM_LIBRARY_DIRS})
 
-add_executable(cairomotion main.cpp
+add_executable(motion main.cpp
         Cairomotion.cpp
         Cairomotion.h
         ui/PopupBar.cpp
@@ -41,4 +41,4 @@ add_executable(cairomotion main.cpp
         History.h
 )
 
-target_link_libraries(cairomotion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params X11)
+target_link_libraries(motion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params X11)
