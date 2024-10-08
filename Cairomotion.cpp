@@ -11,6 +11,7 @@ Cairomotion::Cairomotion(): drawings(tools),
     canvas.drawings = &drawings;
     timeline.drawings = &drawings;
     canvas.timeline = &timeline;
+    canvas.history = &history;
     container.set_center_widget(canvas);
 
     auto style = Gtk::CssProvider::create();

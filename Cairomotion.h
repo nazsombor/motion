@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "Drawings.h"
+#include "History.h"
 #include "ui/PopupBar.h"
 #include "ui/Tools.h"
 #include "ui/Canvas.h"
@@ -27,6 +28,7 @@ class Cairomotion : public Gtk::Window {
     Glib::RefPtr<Gtk::EventControllerKey> eck;
 
     Drawings drawings;
+    History history;
 
     // canvas resize variables
     bool start_window_size_change = false;

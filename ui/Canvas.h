@@ -12,6 +12,7 @@
 #include "../thirdparty/ink-stroke-modeler/ink_stroke_modeler/params.h"
 
 #include "../Drawings.h"
+#include "../History.h"
 
 class Canvas : public Gtk::DrawingArea{
     int canvas_width = 1920, canvas_height = 1080;
@@ -22,9 +23,11 @@ class Canvas : public Gtk::DrawingArea{
     std::vector<ink::stroke_model::Result> smoothed_stroke;
     bool is_stylus_down = false;
 
+
 public:
     Drawings *drawings;
     Timeline *timeline;
+    History *history;
     Glib::RefPtr<Gtk::GestureStylus> *gs;
     bool stylus_up_is_not_primary_button;
 

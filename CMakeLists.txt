@@ -37,6 +37,8 @@ add_executable(cairomotion main.cpp
         ui/Timeline.h
         ui/FileOperation.cpp
         ui/FileOperation.h
+        History.cpp
+        History.h
 )
 
 target_link_libraries(cairomotion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params X11)

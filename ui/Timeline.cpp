@@ -47,6 +47,7 @@ Layer::Layer(int index, Timeline *timeline) : index(index) {
     header.set_orientation(Gtk::Orientation::HORIZONTAL);
     header.append(ml);
     header.append(label);
+    label.set_visible(false);
 
     gc = Gtk::GestureClick::create();
     gc->signal_released().connect(sigc::mem_fun(*this, &Layer::on_click));

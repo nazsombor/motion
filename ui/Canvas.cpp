@@ -49,7 +49,6 @@ void Canvas::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int hei
 }
 
 void Canvas::on_stylus_down(double x, double y) {
-    std::cout << x << " " << y << std::endl;
     modeler.Reset();
 
     smoothed_stroke.clear();
@@ -71,6 +70,8 @@ void Canvas::on_stylus_down(double x, double y) {
     drawings->clear_stroke_data();
 
     timeline->check_if_frame_exists();
+
+    history->append_drawing();
 
     switch (drawings->tools->type) {
         case Tools::PEN:
