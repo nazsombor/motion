@@ -4,17 +4,25 @@
 
 #ifndef HISTORY_H
 #define HISTORY_H
-#include <vector>
+#include <stack>
+#include "ui/Tools.h"
 
 class Action {
+public:
+    bool is_pen_or_pencil;
+    bool new_frame_added;
+    int frame_index, layer_index;
+    Cairo::RefPtr<Cairo::ImageSurface> surface;
 
+    Action(bool is_pen_or_pencil, bool new_frame_added, int frame_index, int layer_index, Cairo::RefPtr<Cairo::ImageSurface> &surface);
 };
 
 class History {
 public:
-    std::vector<Action> actions;
+    Tools *tools;
+    std::stack<Action> actions;
 
-    void append_drawing();
+    void append_drawing(Cairo::RefPtr<Cairo::ImageSurface> & ref, bool is_pen_or_pencil, bool new_frame_added, int frame_index, int layer_index);
 };
 
 

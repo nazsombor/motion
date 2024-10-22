@@ -9,6 +9,10 @@
 #include "Placeholder.h"
 #include "../Drawings.h"
 
+#include "../History.h"
+
+
+class History;
 
 class Frame {
 public:
@@ -63,6 +67,8 @@ class Layer {
     Frame *get_next_frame(int frame_index);
 
     int get_last_frame_index();
+
+    void remove_frame(Frame * frame);
 };
 
 class LayerHeader : public Gtk::Viewport {
@@ -147,6 +153,7 @@ public:
     Drawings *drawings;
     std::vector<Layer*> layers;
     bool request_canvas_redraw = false;
+    History* history;
 
     Timeline();
 
@@ -173,6 +180,10 @@ public:
     void clear_layers();
 
     void export_to(const std::string & string);
+
+    void save_in_history(Frame * frame, bool new_frame_added);
+
+    void undo();
 };
 
 

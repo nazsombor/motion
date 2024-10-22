@@ -27,7 +27,6 @@ class Canvas : public Gtk::DrawingArea{
 public:
     Drawings *drawings;
     Timeline *timeline;
-    History *history;
     Glib::RefPtr<Gtk::GestureStylus> *gs;
     bool stylus_up_is_not_primary_button;
 

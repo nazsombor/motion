@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(cairomotion)
+project(motion)
 
 set(CMAKE_CXX_STANDARD 23)
 
@@ -11,8 +11,8 @@ include_directories(${GTKMM_INCLUDE_DIRS})
 link_directories(${GTKMM_LIBRARY_DIRS})
 
 add_executable(motion main.cpp
-        Cairomotion.cpp
-        Cairomotion.h
+        MotionApp.cpp
+        MotionApp.h
         ui/PopupBar.cpp
         ui/PopupBar.h
         ui/Placeholder.cpp

@@ -2,16 +2,17 @@
 // Created by abraham on 8/12/24.
 //
 
-#include "Cairomotion.h"
+#include "MotionApp.h"
 
-Cairomotion::Cairomotion(): drawings(tools),
-                            pb2(&container, &tools, &canvas, PopupBar::LEFT),
-                            pb1(&pb2, &timeline, &canvas, PopupBar::BOTTOM) {
+MotionApp::MotionApp(): drawings(tools),
+                        pb2(&container, &tools, &canvas, PopupBar::LEFT),
+                        pb1(&pb2, &timeline, &canvas, PopupBar::BOTTOM) {
     canvas.set_valign(Gtk::Align::CENTER);
     canvas.drawings = &drawings;
     timeline.drawings = &drawings;
+    timeline.history = &history;
     canvas.timeline = &timeline;
-    canvas.history = &history;
+    history.tools = &tools;
     container.set_center_widget(canvas);
 
     auto style = Gtk::CssProvider::create();
@@ -34,20 +35,20 @@ Cairomotion::Cairomotion(): drawings(tools),
 
     gc = Gtk::GestureClick::create();
     gc->set_button(0);
-    gc->signal_released().connect(sigc::mem_fun(*this, &Cairomotion::on_click));
+    gc->signal_released().connect(sigc::mem_fun(*this, &MotionApp::on_click));
     //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
     canvas.add_controller(gc);
 
     eck = Gtk::EventControllerKey::create();
-    eck->signal_key_released().connect(sigc::mem_fun(*this, &Cairomotion::on_key_released));
+    eck->signal_key_released().connect(sigc::mem_fun(*this, &MotionApp::on_key_released));
     add_controller(eck);
 
     set_default_size(1300, 900);
     set_child(pb1);
-    add_tick_callback(sigc::mem_fun(*this, &Cairomotion::tick));
+    add_tick_callback(sigc::mem_fun(*this, &MotionApp::tick));
 }
 
-void Cairomotion::on_click(int type, double x, double y) {
+void MotionApp::on_click(int type, double x, double y) {
     auto button = gc->get_current_event()->get_button();
 
     switch (button) {
@@ -77,7 +78,7 @@ void Cairomotion::on_click(int type, double x, double y) {
 }
 
 
-void Cairomotion::size_allocate_vfunc(int width, int height, int baseline) {
+void MotionApp::size_allocate_vfunc(int width, int height, int baseline) {
     if (window_width != width || window_height != height) {
         canvas.set_content_width(0);
         canvas.set_content_height(0);
@@ -88,8 +89,10 @@ void Cairomotion::size_allocate_vfunc(int width, int height, int baseline) {
     Gtk::Widget::size_allocate_vfunc(width, height, baseline);
 }
 
-void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) {
+void MotionApp::on_key_released(guint key, guint _, Gdk::ModifierType m_type) {
     std::cout << key << std::endl;
+
+    bool is_ctrl_pressed = static_cast<std::underlying_type<Gdk::ModifierType>::type>(m_type) == 20;
 
     if (util_widget_is_focused(tools.current_color.text)) {
         return;
@@ -129,10 +132,17 @@ void Cairomotion::on_key_released(guint key, guint _, Gdk::ModifierType m_type) 
             tools.current_color.pick_button_clicked = true;
             break;
         }
+        case 122: {
+            if (is_ctrl_pressed) {
+                timeline.undo();
+                canvas.queue_draw();
+            }
+            break;
+        }
     }
 }
 
-void Cairomotion::handle_window_resize(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+void MotionApp::handle_window_resize(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     if (start_window_size_change) {
         window_size_change_timer = clock->get_frame_time();
         start_window_size_change = false;
@@ -156,7 +166,7 @@ void Cairomotion::handle_window_resize(const Glib::RefPtr<Gdk::FrameClock> &cloc
     }
 }
 
-void Cairomotion::handle_play(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+void MotionApp::handle_play(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     if (drawings.play) {
         drawings.stop_playing = true;
         if (clock->get_frame_time() - drawings.previous_frame_time > drawings.frame_duration) {
@@ -171,7 +181,7 @@ void Cairomotion::handle_play(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     }
 }
 
-void Cairomotion::handle_update_color_picker() {
+void MotionApp::handle_update_color_picker() {
     if (tools.color_list.update_color_picker) {
         tools.color_list.update_color_picker = false;
         tools.color_picker.r = tools.color_list.r;
@@ -184,7 +194,7 @@ void Cairomotion::handle_update_color_picker() {
     }
 }
 
-void Cairomotion::handle_pick_color_from_anywhere_the_screen() {
+void MotionApp::handle_pick_color_from_anywhere_the_screen() {
     if (tools.current_color.pick_button_clicked) {
         XQueryPointer(
             tools.current_color.display,
@@ -220,7 +230,7 @@ void Cairomotion::handle_pick_color_from_anywhere_the_screen() {
 }
 
 
-void Cairomotion::handle_save() {
+void MotionApp::handle_save() {
     if (tools.file_operation.start_saving) {
         tools.file_operation.start_saving = false;
 
@@ -246,7 +256,7 @@ void Cairomotion::handle_save() {
     }
 }
 
-void Cairomotion::handle_open() {
+void MotionApp::handle_open() {
     if (tools.file_operation.start_opening) {
         tools.file_operation.start_opening = false;
 
@@ -278,7 +288,7 @@ void Cairomotion::handle_open() {
     }
 }
 
-void Cairomotion::handle_export() {
+void MotionApp::handle_export() {
     if (tools.file_operation.start_export) {
         tools.file_operation.start_export = false;
 
@@ -287,14 +297,14 @@ void Cairomotion::handle_export() {
     }
 }
 
-void Cairomotion::handle_canvas_redraw_on_timeline_change() {
+void MotionApp::handle_canvas_redraw_on_timeline_change() {
     if (timeline.request_canvas_redraw) {
         timeline.request_canvas_redraw = false;
         canvas.queue_draw();
     }
 }
 
-bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
+bool MotionApp::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     handle_window_resize(clock);
     handle_play(clock);
     handle_update_color_picker();
@@ -307,7 +317,7 @@ bool Cairomotion::tick(const Glib::RefPtr<Gdk::FrameClock> &clock) {
     return true;
 }
 
-bool Cairomotion::util_widget_is_focused(Gtk::Widget &widget) {
+bool MotionApp::util_widget_is_focused(Gtk::Widget &widget) {
     const Gtk::Root *root = widget.get_root ();
     if (!root)
         return false;

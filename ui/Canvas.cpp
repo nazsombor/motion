@@ -71,8 +71,6 @@ void Canvas::on_stylus_down(double x, double y) {
 
     timeline->check_if_frame_exists();
 
-    history->append_drawing();
-
     switch (drawings->tools->type) {
         case Tools::PEN:
             drawings->pen(smoothed_stroke);

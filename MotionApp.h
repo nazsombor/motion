@@ -16,7 +16,7 @@
 #include "ui/CanvasContainer.h"
 #include "ui/Timeline.h"
 
-class Cairomotion : public Gtk::Window {
+class MotionApp : public Gtk::Window {
     Canvas canvas;
     Tools tools;
     Timeline timeline;
@@ -43,7 +43,7 @@ class Cairomotion : public Gtk::Window {
     bool is_window_fullscreen = false;
 
 public:
-    Cairomotion();
+    MotionApp();
 
 private:
     void on_click(int type, double x, double y);

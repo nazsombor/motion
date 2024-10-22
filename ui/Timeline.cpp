@@ -160,6 +160,20 @@ int Layer::get_last_frame_index() {
     return frame->index + frame->duration - 1;
 }
 
+void Layer::remove_frame(Frame *frame) {
+    int i = 0;
+    int index = 0;
+    for (auto f : frames) {
+        if (f->index == frame->index) {
+            index = i;
+            break;
+        }
+        i++;
+    }
+    frames.erase(frames.begin() + index);
+    timeline->layers[timeline->layer_index]->background.queue_draw();
+}
+
 LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), top_margin(20, 20, Placeholder::WHITE) {
     set_child(container);
     container.set_orientation(Gtk::Orientation::VERTICAL);
@@ -400,15 +414,19 @@ void Timeline::draw_top_and_bottom() {
 
 void Timeline::check_if_frame_exists() {
     auto frame = layers[layer_index]->get_frame(frame_index);
+    bool new_frame_added = false;
 
     if (!frame) {
         frame = new Frame(frame_index);
+        new_frame_added = true;
         layers[layer_index]->frames.push_back(frame);
         auto previous_frame = layers[layer_index]->get_previous_frame(frame);
         if (previous_frame) {
             previous_frame->duration = frame_index - previous_frame->index;
         }
     }
+
+    save_in_history(frame, new_frame_added);
 
     Cairo::RefPtr<Cairo::ImageSurface> top;
     Cairo::RefPtr<Cairo::ImageSurface> bottom;
@@ -522,4 +540,54 @@ void Timeline::export_to(const std::string &path) {
 
         index++;
     }
+}
+
+void Timeline::save_in_history(Frame *frame, bool new_frame_added) {
+
+    auto surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
+    bool is_pen_or_pencil = false;
+    Cairo::RefPtr<Cairo::ImageSurface> copy_surface;
+
+    if (history->tools->type == Tools::PEN || history->tools->type == Tools::PENCIL) {
+        copy_surface = frame->surface;
+        is_pen_or_pencil = true;
+    } else {
+        copy_surface = frame->surface2;
+    }
+
+    auto ctr = Cairo::Context::create(surface);
+    ctr->set_source(copy_surface, 0, 0);
+    ctr->paint();
+
+    if (is_pen_or_pencil) {
+        frame->surface = surface;
+    } else {
+        frame->surface2 = surface;
+    }
+
+    history->append_drawing(copy_surface, is_pen_or_pencil, new_frame_added, frame_index, layer_index);
+
+}
+
+void Timeline::undo() {
+    if (history->actions.empty()) {
+        return;
+    }
+    auto action = history->actions.top();
+    history->actions.pop();
+
+    auto frame = layers[action.layer_index]->get_frame(action.frame_index);
+
+    if (action.is_pen_or_pencil) {
+        frame->surface = action.surface;
+        drawings->surface = frame->surface;
+    } else {
+        frame->surface2 = action.surface;
+        drawings->surface2 = frame->surface;
+    }
+
+    if (action.new_frame_added) {
+        layers[action.layer_index]->remove_frame(frame);
+    }
+
 }
