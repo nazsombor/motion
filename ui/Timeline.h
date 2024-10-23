@@ -5,18 +5,16 @@
 #ifndef TIMELINE_H
 #define TIMELINE_H
 #include <gtkmm/box.h>
+#include <ao/ao.h>
 
 #include "Placeholder.h"
 #include "../Drawings.h"
-
 #include "../History.h"
-
-
-class History;
 
 class Frame {
 public:
     int index, duration = 1;
+    bool is_selected = false;
     Cairo::RefPtr<Cairo::ImageSurface> surface, surface2, onion_skin;
     Frame(int index);
 };
@@ -37,9 +35,13 @@ class Timeline;
 
 class Layer {
     public:
+    enum Type {IMAGE, SOUND} type = IMAGE;
     int index = 0;
+    int frame_select_start = -1, frame_select_length = -1;
+    bool is_frame_selected = false;
     std::vector<Frame*> frames;
     Gtk::DrawingArea background;
+    Glib::RefPtr<Gtk::GestureStylus> gs;
     Gtk::Box header;
     MoveLayer ml;
     Gtk::Entry label;
@@ -69,6 +71,12 @@ class Layer {
     int get_last_frame_index();
 
     void remove_frame(Frame * frame);
+
+    void on_stylus_down(double x, double y);
+
+    void on_stylus_motion(double x, double y);
+
+    void on_stylus_up(double x, double y);
 };
 
 class LayerHeader : public Gtk::Viewport {
@@ -97,13 +105,6 @@ public:
     Gtk::SizeRequestMode get_request_mode_vfunc() const override;
 
     void measure_vfunc(Gtk::Orientation orientation, int for_size, int &minimum, int &natural, int &minimum_baseline, int &natural_baseline) const override;
-
-    void on_stylus_down(double x, double y);
-
-    void on_stylus_motion(double x, double y);
-
-    void on_stylus_up(double x, double y);
-
 };
 
 class TimelineNumbers : public Gtk::Viewport {
@@ -135,7 +136,7 @@ class Timeline : public Gtk::Box {
 public:
     // UI
     Gtk::Box button_container, layer_container, content_container;
-    Gtk::Button add_layer_button, add_inbetween_button;
+    Gtk::Button add_layer_button, add_sound_layer_button, add_inbetween_button;
     Glib::RefPtr<Gtk::Adjustment> layer_v_adjustment, layer_header_h_adjustment, layer_content_h_adjustment, not_in_use;
     TimelineNumbers timeline_numbers;
     LayerHeader header;
@@ -160,6 +161,10 @@ public:
     void resize(int width, int height);
 
     void new_layer_button_on_click();
+
+    void add_inbetween_button_on_click();
+
+    void new_sound_layer_button_on_click();
 
     Layer *append_new_layer();
 

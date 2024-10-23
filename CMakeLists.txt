@@ -41,4 +41,4 @@ add_executable(motion main.cpp
         History.h
 )
 
-target_link_libraries(motion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params X11)
+target_link_libraries(motion ${GTKMM_LIBRARIES} InkStrokeModeler::stroke_modeler InkStrokeModeler::types InkStrokeModeler::params X11 ao)

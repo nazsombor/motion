@@ -4,13 +4,13 @@
 
 #include "Timeline.h"
 
-Frame::Frame(int index) : index(index){
+Frame::Frame(int index) : index(index) {
     surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     surface2 = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     onion_skin = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
 }
 
-MoveLayer::MoveLayer() : gs(Gtk::GestureClick::create()){
+MoveLayer::MoveLayer() : gs(Gtk::GestureClick::create()) {
     set_draw_func(sigc::mem_fun(*this, &MoveLayer::on_draw));
     set_content_width(50);
     set_content_height(60);
@@ -36,7 +36,6 @@ void MoveLayer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int 
 }
 
 void MoveLayer::on_click(int count, double x, double y) {
-
 }
 
 Layer::Layer(int index, Timeline *timeline) : index(index) {
@@ -53,6 +52,12 @@ Layer::Layer(int index, Timeline *timeline) : index(index) {
     gc->signal_released().connect(sigc::mem_fun(*this, &Layer::on_click));
     header.add_controller(gc);
 
+    gs = Gtk::GestureStylus::create();
+    gs->signal_down().connect(sigc::mem_fun(*this, &Layer::on_stylus_down));
+    gs->signal_motion().connect(sigc::mem_fun(*this, &Layer::on_stylus_motion));
+    gs->signal_up().connect(sigc::mem_fun(*this, &Layer::on_stylus_up));
+    background.add_controller(gs);
+
     this->timeline = timeline;
 }
 
@@ -67,12 +72,17 @@ void Layer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int heig
         ctx->fill();
     }
 
-    for (auto frame : frames) {
+    for (auto frame: frames) {
         ctx->set_source_rgb(0.9, 0.9, 0.9);
         ctx->rectangle(frame->index * 40, 0, frame->duration * 40, 60);
         ctx->fill_preserve();
         ctx->set_source_rgb(0, 0, 0);
         ctx->stroke();
+        if (frame->is_selected) {
+            ctx->set_source_rgba(0.0, 0.0, 1, 0.2);
+            ctx->rectangle(frame->index * 40, 0, frame->duration * 40, 60);
+            ctx->fill();
+        }
     }
 
     ctx->set_source_rgb(0, 0, 0);
@@ -85,7 +95,7 @@ void Layer::deselect() {
 }
 
 void Layer::select() {
-    for (auto l : timeline->layers) {
+    for (auto l: timeline->layers) {
         l->deselect();
     }
     header.add_css_class("selected-layer");
@@ -98,17 +108,18 @@ void Layer::on_click(int count, double x, double y) {
 
 Frame *Layer::get_frame(int frame_index) {
     auto f = frames.size();
-    for(auto frame : frames) {
-        if (frame->index == frame_index || (frame->index + frame->duration > frame_index && frame->index < frame_index)) {
+    for (auto frame: frames) {
+        if (frame->index == frame_index || (frame->index + frame->duration > frame_index && frame->index <
+                                            frame_index)) {
             return frame;
         }
     }
     return nullptr;
 }
 
-Frame * Layer::get_previous_frame(Frame *frame) {
+Frame *Layer::get_previous_frame(Frame *frame) {
     Frame *previous_frame = nullptr;
-    for (auto f : frames) {
+    for (auto f: frames) {
         if (f == frame) {
             return previous_frame;
         }
@@ -120,7 +131,7 @@ Frame * Layer::get_previous_frame(Frame *frame) {
 Frame *Layer::get_previous_frame(int frame_index) {
     Frame *previous_frame = nullptr;
 
-    for (auto frame : frames) {
+    for (auto frame: frames) {
         if (frame->index + frame->duration - 1 < frame_index) {
             previous_frame = frame;
         }
@@ -129,7 +140,7 @@ Frame *Layer::get_previous_frame(int frame_index) {
     return previous_frame;
 }
 
-Frame * Layer::get_next_frame(Frame *frame) {
+Frame *Layer::get_next_frame(Frame *frame) {
     Frame *next_frame = nullptr;
     for (int i = frames.size() - 1; i >= 0; i--) {
         if (frames[i] == frame) {
@@ -140,8 +151,7 @@ Frame * Layer::get_next_frame(Frame *frame) {
     return nullptr;
 }
 
-Frame * Layer::get_next_frame(int frame_index) {
-
+Frame *Layer::get_next_frame(int frame_index) {
     Frame *next_frame = nullptr;
 
     if (frames.size() == 0) return nullptr;
@@ -156,6 +166,7 @@ Frame * Layer::get_next_frame(int frame_index) {
 }
 
 int Layer::get_last_frame_index() {
+    if (frames.size() == 0) return -1;
     auto frame = frames[frames.size() - 1];
     return frame->index + frame->duration - 1;
 }
@@ -163,7 +174,7 @@ int Layer::get_last_frame_index() {
 void Layer::remove_frame(Frame *frame) {
     int i = 0;
     int index = 0;
-    for (auto f : frames) {
+    for (auto f: frames) {
         if (f->index == frame->index) {
             index = i;
             break;
@@ -174,7 +185,71 @@ void Layer::remove_frame(Frame *frame) {
     timeline->layers[timeline->layer_index]->background.queue_draw();
 }
 
-LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), top_margin(20, 20, Placeholder::WHITE) {
+void Layer::on_stylus_down(double x, double y) {
+    if (is_frame_selected) {
+        is_frame_selected = false;
+        for (auto frame: frames) {
+            frame->is_selected = false;
+        }
+        background.queue_draw();
+        return;
+    }
+    is_frame_selected = true;
+    frame_select_start = x / 40;
+    frame_select_length = 1;
+
+    for (auto frame : frames) {
+        frame->is_selected = false;
+    }
+    for (int i = frame_select_start; i < frame_select_start + frame_select_length; i++) {
+        auto frame = get_frame(i);
+        if (frame) {
+            if (i >= frame_select_start && i <= frame_select_start + frame_select_length) {
+                frame->is_selected = true;
+            }
+        }
+    }
+    background.queue_draw();
+}
+
+void Layer::on_stylus_motion(double x, double y) {
+    if (is_frame_selected) {
+        int sel = x / 40;
+        frame_select_length = sel - frame_select_start;
+
+        for (auto frame : frames) {
+            frame->is_selected = false;
+        }
+
+
+        if (frame_select_length > 0) {
+            for (int i = frame_select_start; i <= frame_select_start + frame_select_length; i++) {
+                auto frame = get_frame(i);
+                if (frame) {
+                    if (i >= frame_select_start && i <= frame_select_start + frame_select_length) {
+                        frame->is_selected = true;
+                    }
+                }
+            }
+        } else {
+            for (int i = frame_select_start + frame_select_length; i <= frame_select_start; i++) {
+                auto frame = get_frame(i);
+                if (frame) {
+                    if (i >= frame_select_start + frame_select_length && i <= frame_select_start) {
+                        frame->is_selected = true;
+                    }
+                }
+            }
+        }
+        background.queue_draw();
+    }
+}
+
+void Layer::on_stylus_up(double x, double y) {
+}
+
+LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v),
+    top_margin(20, 20, Placeholder::WHITE) {
     set_child(container);
     container.set_orientation(Gtk::Orientation::VERTICAL);
     container.append(top_margin);
@@ -197,13 +272,10 @@ void LayerHeader::measure_vfunc(Gtk::Orientation orientation, int for_size, int 
     }
 }
 
-LayerContent::LayerContent(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), gs(Gtk::GestureStylus::create()){
+LayerContent::LayerContent(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v),
+    gs(Gtk::GestureStylus::create()) {
     set_child(container);
     container.set_orientation(Gtk::Orientation::VERTICAL);
-    gs->signal_down().connect(sigc::mem_fun(*this, &LayerContent::on_stylus_down));
-    gs->signal_motion().connect(sigc::mem_fun(*this, &LayerContent::on_stylus_motion));
-    gs->signal_up().connect(sigc::mem_fun(*this, &LayerContent::on_stylus_up));
-    container.add_controller(gs);
 }
 
 Gtk::SizeRequestMode LayerContent::get_request_mode_vfunc() const {
@@ -223,20 +295,9 @@ void LayerContent::measure_vfunc(Gtk::Orientation orientation, int for_size, int
     }
 }
 
-void LayerContent::on_stylus_down(double x, double y) {
-    std::cout << x << ' ' << y << std::endl;
-
-}
-
-void LayerContent::on_stylus_motion(double x, double y) {
-    std::cout << x << ' ' << y << std::endl;
-}
-
-void LayerContent::on_stylus_up(double x, double y) {
-    std::cout << x << ' ' << y << std::endl;
-}
-
-TimelineNumbers::TimelineNumbers(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v), gc(Gtk::GestureClick::create()) {
+TimelineNumbers::TimelineNumbers(Glib::RefPtr<Gtk::Adjustment> &h,
+                                 Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v),
+                                                                     gc(Gtk::GestureClick::create()) {
     set_child(frames);
     frames.set_content_width(3000);
     frames.set_content_height(20);
@@ -244,7 +305,6 @@ TimelineNumbers::TimelineNumbers(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<
 
     gc->signal_released().connect(sigc::mem_fun(*this, &TimelineNumbers::on_click));
     add_controller(gc);
-
 }
 
 void TimelineNumbers::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int height) {
@@ -275,7 +335,7 @@ Gtk::SizeRequestMode TimelineNumbers::get_request_mode_vfunc() const {
 }
 
 void TimelineNumbers::measure_vfunc(Gtk::Orientation orientation, int for_size, int &minimum, int &natural,
-    int &minimum_baseline, int &natural_baseline) const {
+                                    int &minimum_baseline, int &natural_baseline) const {
     minimum_baseline = natural_baseline = -1;
 
     if (orientation == Gtk::Orientation::HORIZONTAL) {
@@ -284,7 +344,8 @@ void TimelineNumbers::measure_vfunc(Gtk::Orientation orientation, int for_size, 
     } else {
         minimum = 20;
         natural = 20;
-    }}
+    }
+}
 
 void TimelineNumbers::set_frame_index(int index) {
     frame_index = index;
@@ -305,15 +366,19 @@ Timeline::Timeline() : layer_header_h_adjustment(Gtk::Adjustment::create(0, 0, 1
                        layer_v_adjustment(Gtk::Adjustment::create(0, 0, 100)),
                        header(layer_header_h_adjustment, layer_v_adjustment),
                        content(layer_content_h_adjustment, layer_v_adjustment),
-                       timeline_numbers(layer_content_h_adjustment, not_in_use){
+                       timeline_numbers(layer_content_h_adjustment, not_in_use) {
     set_orientation(Gtk::Orientation::VERTICAL);
 
     button_container.set_orientation(Gtk::Orientation::HORIZONTAL);
     button_container.append(add_layer_button);
+    button_container.append(add_sound_layer_button);
     button_container.append(add_inbetween_button);
     add_layer_button.set_label("Add Layer");
     add_layer_button.signal_clicked().connect(sigc::mem_fun(*this, &Timeline::new_layer_button_on_click));
+    add_sound_layer_button.set_label("Add Sound Layer");
+    add_sound_layer_button.signal_clicked().connect(sigc::mem_fun(*this, &Timeline::new_sound_layer_button_on_click));
     add_inbetween_button.set_label("Add In-between");
+    add_inbetween_button.signal_clicked().connect(sigc::mem_fun(*this, &Timeline::add_inbetween_button_on_click));
     append(button_container);
 
     layer_container.set_orientation(Gtk::Orientation::HORIZONTAL);
@@ -350,6 +415,26 @@ void Timeline::resize(int width, int height) {
 
 void Timeline::new_layer_button_on_click() {
     append_new_layer();
+}
+
+void Timeline::add_inbetween_button_on_click() {
+    for (auto layer : layers) {
+        for (auto frame : layer->frames) {
+            if (frame->is_selected && frame->duration > 1) {
+                auto t = (frame->duration) / 2;
+                auto f = new Frame(frame->index + t);
+                f->duration = frame->duration - t;
+                f->is_selected = true;
+                layer->frames.push_back(f);
+
+                frame->duration = t;
+            }
+        }
+        layer->background.queue_draw();
+    }
+}
+
+void Timeline::new_sound_layer_button_on_click() {
 }
 
 Layer *Timeline::append_new_layer() {
@@ -433,6 +518,10 @@ void Timeline::check_if_frame_exists() {
 
     draw_top_and_bottom();
 
+    if (!frame->surface) {
+        std::cout << "wtf" << std::endl;
+    }
+
     drawings->surface = frame->surface;
     drawings->surface2 = frame->surface2;
     drawings->onion_skin = frame->onion_skin;
@@ -440,7 +529,6 @@ void Timeline::check_if_frame_exists() {
     drawings->calculate_onion_skin();
 
     layers[layer_index]->background.queue_draw();
-
 }
 
 void Timeline::set_frame_index(int index) {
@@ -473,13 +561,11 @@ void Timeline::set_frame_index(int index) {
         drawings->next_surface = nullptr;
     }
     drawings->calculate_onion_skin();
-
 }
 
 void Timeline::play_next() {
-
     int last_frame_index = 0;
-    for (auto layer : layers) {
+    for (auto layer: layers) {
         int lfi = layer->get_last_frame_index();
         if (lfi > last_frame_index) {
             last_frame_index = lfi;
@@ -494,8 +580,7 @@ void Timeline::play_next() {
 }
 
 void Timeline::clear_layers() {
-
-    for (auto layer : layers) {
+    for (auto layer: layers) {
         content.container.remove(layer->background);
         header.container.remove(layer->header);
     }
@@ -504,12 +589,11 @@ void Timeline::clear_layers() {
     next_layer_index = 0;
 
     layers.clear();
-
 }
 
 void Timeline::export_to(const std::string &path) {
     int last_frame_index = 0;
-    for (auto layer : layers) {
+    for (auto layer: layers) {
         auto l = layer->get_last_frame_index();
         if (l > last_frame_index) {
             last_frame_index = l;
@@ -543,7 +627,6 @@ void Timeline::export_to(const std::string &path) {
 }
 
 void Timeline::save_in_history(Frame *frame, bool new_frame_added) {
-
     auto surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, 1920, 1080);
     bool is_pen_or_pencil = false;
     Cairo::RefPtr<Cairo::ImageSurface> copy_surface;
@@ -566,7 +649,6 @@ void Timeline::save_in_history(Frame *frame, bool new_frame_added) {
     }
 
     history->append_drawing(copy_surface, is_pen_or_pencil, new_frame_added, frame_index, layer_index);
-
 }
 
 void Timeline::undo() {
@@ -589,5 +671,4 @@ void Timeline::undo() {
     if (action.new_frame_added) {
         layers[action.layer_index]->remove_frame(frame);
     }
-
 }

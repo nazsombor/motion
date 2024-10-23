@@ -92,6 +92,9 @@ void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int
 }
 
 void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
+
+    if (!surface) return;
+
     auto cr = Cairo::Context::create(surface);
 
     for (int i = stroke_index + 1; i < stroke.size(); i++) {
@@ -114,6 +117,9 @@ void Drawings::pen(std::vector<ink::stroke_model::Result> &stroke) {
 }
 
 void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
+
+    if (!surface) return;
+
     surface->flush();
     int width = surface->get_width();
     int height = surface->get_height();
@@ -180,6 +186,8 @@ void Drawings::pencil(std::vector<ink::stroke_model::Result> &stroke) {
 void Drawings::solid_brush(std::vector<ink::stroke_model::Result> &stroke) {
     double size = 50.0;
 
+    if (!surface2) return;
+
     auto cr = Cairo::Context::create(surface2);
 
     for (int i = stroke_index; i < stroke.size(); i++) {
@@ -213,6 +221,9 @@ public:
 };
 
 void Drawings::fill_area(int x, int y) {
+
+    if (!surface2) return;
+
     surface2->flush();
 
     unsigned char check_color[4], fill_color[4] = {
