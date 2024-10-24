@@ -74,8 +74,10 @@ void Drawings::on_draw(const std::shared_ptr<Cairo::Context> &cr, int width, int
     }
     if (!play) {
         if (onion_skin) {
-            cr->set_source(onion_skin, 0, 0);
-            cr->paint();
+            if (should_onion_skin_be_presented) {
+                cr->set_source(onion_skin, 0, 0);
+                cr->paint();
+            }
         }
     }
     if (surface) {
@@ -368,18 +370,28 @@ void Drawings::calculate_onion_skin() {
         if (previous_surface) {
             auto d2 = &previous_surface->get_data()[i];
             if (d2[3] != 0) {
-                data[0] = 255;
-                data[3] = 100;
+                //data[0] = 255;
+                data[0] = 89;
+                data[1] = 103;
+                data[2] = 214;
+                data[3] = 200;
             }
         }
         if (next_surface) {
             auto d2 = &next_surface->get_data()[i];
             if (d2[3] != 0) {
-                data[1] = 255;
-                data[3] = 100;
+                //data[1] = 255;
+                data[0] = 117;
+                data[1] = 217;
+                data[2] = 225;
+                data[3] = 255;
             }
         }
     }
 
     onion_skin->mark_dirty(0, 0, onion_skin->get_width(), onion_skin->get_height());
+}
+
+void Drawings::toggle_onion_skin() {
+    should_onion_skin_be_presented = !should_onion_skin_be_presented;
 }

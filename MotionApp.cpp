@@ -58,8 +58,10 @@ void MotionApp::on_click(int type, double x, double y) {
                 int x_int = r * x;
                 int y_int = r * y;
                 drawings.fill_area(x_int, y_int);
-                canvas.queue_draw();
+            } else if (tools.pen_or_pencil_selected){
+                drawings.toggle_onion_skin();
             }
+            canvas.queue_draw();
             canvas.stylus_up_is_not_primary_button = true;
             break;
         }

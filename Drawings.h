@@ -21,6 +21,7 @@ public:
     gint64 frame_duration = 1000000 / 12;
     gint64 previous_frame_time = 0;
     bool play = false, stop_playing = false;
+    bool should_onion_skin_be_presented = true;
     Tools *tools;
 
     Drawings(Tools &tools);
@@ -48,5 +49,7 @@ public:
     unsigned char *pixel2(int x, int y);
 
     void calculate_onion_skin();
+
+    void toggle_onion_skin();
 };
 #endif //DRAWINGS_H

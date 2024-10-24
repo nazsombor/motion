@@ -25,6 +25,7 @@ public:
     CurrentColor current_color;
     ColorPicker color_picker;
     bool solid_brush_selected;
+    bool pen_or_pencil_selected;
     FileOperation file_operation;
 
     Tools();
