@@ -419,17 +419,32 @@ void Timeline::new_layer_button_on_click() {
 
 void Timeline::add_inbetween_button_on_click() {
     for (auto layer : layers) {
+        int i = 0;
+
+        struct new_frame {
+            Frame *frame;
+            int index;
+        };
+        std::vector<new_frame> new_frames;
+
         for (auto frame : layer->frames) {
             if (frame->is_selected && frame->duration > 1) {
                 auto t = (frame->duration) / 2;
                 auto f = new Frame(frame->index + t);
                 f->duration = frame->duration - t;
                 f->is_selected = true;
-                layer->frames.push_back(f);
-
+                new_frames.emplace_back(f, i + 1);
                 frame->duration = t;
             }
+            i++;
         }
+
+        int j = 0;
+        for (auto nf : new_frames) {
+            layer->frames.insert(layer->frames.begin() + nf.index + j, nf.frame);
+            j++;
+        }
+
         layer->background.queue_draw();
     }
 }
