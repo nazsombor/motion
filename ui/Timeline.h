@@ -39,6 +39,11 @@ class Layer {
     int index = 0;
     int frame_select_start = -1, frame_select_length = -1;
     bool is_frame_selected = false;
+    Frame *anchored_frame;
+
+    enum Anchor{BEGIN, END} anchor = END;
+    bool is_anchored_frame = false;
+
     std::vector<Frame*> frames;
     Gtk::DrawingArea background;
     Glib::RefPtr<Gtk::GestureStylus> gs;
@@ -72,7 +77,15 @@ class Layer {
 
     void remove_frame(Frame * frame);
 
+    void select_frame_range_on_down(double x);
+
+    bool grab_frame_anchor(double x, double y);
+
     void on_stylus_down(double x, double y);
+
+    void select_frame_range_on_motion(double x);
+
+    void calculate_duration(double x);
 
     void on_stylus_motion(double x, double y);
 

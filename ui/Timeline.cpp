@@ -82,6 +82,11 @@ void Layer::on_draw(const Glib::RefPtr<Cairo::Context> &ctx, int width, int heig
             ctx->set_source_rgba(0.0, 0.0, 1, 0.2);
             ctx->rectangle(frame->index * 40, 0, frame->duration * 40, 60);
             ctx->fill();
+            ctx->set_source_rgb(0, 0, 0);
+            ctx->rectangle((frame->index) * 40, 0, 20, 20);
+            ctx->stroke();
+            ctx->rectangle((frame->index + frame->duration - 1) * 40 + 20, 40, 20, 20);
+            ctx->stroke();
         }
     }
 
@@ -185,7 +190,7 @@ void Layer::remove_frame(Frame *frame) {
     timeline->layers[timeline->layer_index]->background.queue_draw();
 }
 
-void Layer::on_stylus_down(double x, double y) {
+void Layer::select_frame_range_on_down(double x) {
     if (is_frame_selected) {
         is_frame_selected = false;
         for (auto frame: frames) {
@@ -212,7 +217,34 @@ void Layer::on_stylus_down(double x, double y) {
     background.queue_draw();
 }
 
-void Layer::on_stylus_motion(double x, double y) {
+bool Layer::grab_frame_anchor(double x, double y) {
+    if (!is_frame_selected) return false;
+
+    for (auto frame : frames) {
+        int ax = frame->index * 40, ay = 0, aw = ax + 20, ah = ay + 20;
+        int bx = (frame->index + frame->duration - 1) * 40 + 20, by = 40, bw = bx + 20, bh = by + 20;
+        if (x >= bx && x <= bw && y >= by && y <= bh) {
+
+            anchored_frame = frame;
+            anchor = Anchor::END;
+            is_anchored_frame = true;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Layer::on_stylus_down(double x, double y) {
+    if (grab_frame_anchor(x, y)) {
+
+    } else {
+        select_frame_range_on_down(x);
+    }
+}
+
+void Layer::select_frame_range_on_motion(double x) {
     if (is_frame_selected) {
         int sel = x / 40;
         frame_select_length = sel - frame_select_start;
@@ -245,7 +277,37 @@ void Layer::on_stylus_motion(double x, double y) {
     }
 }
 
+void Layer::calculate_duration(double x) {
+    auto nf = get_next_frame(anchored_frame);
+    if (anchor == Anchor::END) {
+        int value = (x - (anchored_frame->index * 40)) / 40 + 1;
+        if (value >= 1) {
+
+            bool can_grow = true;
+            if (nf) {
+                can_grow = value <= nf->index - anchored_frame->index;
+            }
+            if (can_grow) {
+                anchored_frame->duration = value;
+            }
+
+            background.queue_draw();
+        }
+    } else {
+
+    }
+}
+
+void Layer::on_stylus_motion(double x, double y) {
+    if (is_anchored_frame) {
+        calculate_duration(x);
+    } else {
+        select_frame_range_on_motion(x);
+    }
+}
+
 void Layer::on_stylus_up(double x, double y) {
+    is_anchored_frame = false;
 }
 
 LayerHeader::LayerHeader(Glib::RefPtr<Gtk::Adjustment> &h, Glib::RefPtr<Gtk::Adjustment> &v) : Gtk::Viewport(h, v),
