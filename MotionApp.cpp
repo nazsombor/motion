@@ -35,10 +35,10 @@ MotionApp::MotionApp(): drawings(tools),
     gc->set_button(0);
     gc->signal_released().connect(sigc::mem_fun(*this, &MotionApp::on_click));
     //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
-    canvas.add_controller(gc);
 
     gs = Gtk::GestureStylus::create();
     canvas.setup_gesture_stylus(gs);
+    canvas.add_controller(gc);
 
     eck = Gtk::EventControllerKey::create();
     eck->signal_key_released().connect(sigc::mem_fun(*this, &MotionApp::on_key_released));
