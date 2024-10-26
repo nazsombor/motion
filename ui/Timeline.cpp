@@ -742,7 +742,7 @@ void Timeline::undo() {
         drawings->surface = frame->surface;
     } else {
         frame->surface2 = action.surface;
-        drawings->surface2 = frame->surface;
+        drawings->surface2 = frame->surface2;
     }
 
     if (action.new_frame_added) {

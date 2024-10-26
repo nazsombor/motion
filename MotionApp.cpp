@@ -30,14 +30,15 @@ MotionApp::MotionApp(): drawings(tools),
     tools.color_list.get_style_context()->add_provider(style,GTK_STYLE_PROVIDER_PRIORITY_USER);
     timeline.content.container.get_style_context()->add_provider(style, GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-    gs = Gtk::GestureStylus::create();
-    canvas.setup_gesture_stylus(gs);
 
     gc = Gtk::GestureClick::create();
     gc->set_button(0);
     gc->signal_released().connect(sigc::mem_fun(*this, &MotionApp::on_click));
     //it's not the window who gets the gesture, but the canvas because it must be on the same widget level where the stylus gesture
     canvas.add_controller(gc);
+
+    gs = Gtk::GestureStylus::create();
+    canvas.setup_gesture_stylus(gs);
 
     eck = Gtk::EventControllerKey::create();
     eck->signal_key_released().connect(sigc::mem_fun(*this, &MotionApp::on_key_released));
@@ -57,6 +58,7 @@ void MotionApp::on_click(int type, double x, double y) {
             if (tools.solid_brush_selected) {
                 int x_int = r * x;
                 int y_int = r * y;
+                timeline.check_if_frame_exists();
                 drawings.fill_area(x_int, y_int);
             } else if (tools.pen_or_pencil_selected){
                 drawings.toggle_onion_skin();
@@ -66,6 +68,7 @@ void MotionApp::on_click(int type, double x, double y) {
             break;
         }
         case GDK_BUTTON_PRIMARY: {
+            std::cout << "Main button" << std::endl;
             canvas.stylus_up_is_not_primary_button = false;
             break;
         }

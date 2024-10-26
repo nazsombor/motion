@@ -49,6 +49,9 @@ void Canvas::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int hei
 }
 
 void Canvas::on_stylus_down(double x, double y) {
+
+    if (stylus_up_is_not_primary_button) return;
+
     modeler.Reset();
 
     smoothed_stroke.clear();
